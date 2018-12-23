@@ -2,11 +2,12 @@ package com.samuelraynor.app.c196_samuelraynor.feature;
 
 import android.support.annotation.StringDef;
 
+import java.io.Serializable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Date;
 
-public class Assessment {
+public class Assessment implements Serializable {
 
     private String title;
 

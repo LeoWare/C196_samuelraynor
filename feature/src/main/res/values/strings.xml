@@ -13,8 +13,19 @@
     <string name="title_activity_terms_entry">TermsEntryActivity</string>
     <string name="title_activity_main">C196 Project</string>
     <string name="title_activity_terms">Terms</string>
+    <string name="title_activity_term_details">Term Details</string>
+    <string name="title_activity_term_edit">Edit Term Details</string>
+    <string name="title_activity_course_detail">Course Details</string>
+    <string name="title_activity_course_edit">Edit Course</string>
     <string name="term_item_name">Name</string>
-    <string name="term_item_start">Start Date</string>
-    <string name="term_item_end">End Date</string>
+    <string name="term_item_start">Start Date: </string>
+    <string name="term_item_end">End Date: </string>
     <string name="western_governors_university_logo">Western Governors University Logo</string>
+    <string name="term_title">Term Title</string>
+    <string name="set_start">Set Start</string>
+    <string name="set_end">Set End</string>
+    <string name="title">Title:</string>
+    <string name="course_title">Course Title</string>
+    <string name="status">Status: </string>
+    <string name="mentor">Mentor: </string>
 </resources>

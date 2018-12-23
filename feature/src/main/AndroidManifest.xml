@@ -14,7 +14,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".TermsActivity"
+            android:name=".TermListActivity"
             android:label="@string/title_activity_terms"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
@@ -22,7 +22,43 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.samuelraynor.app.c196_samuelraynor.feature.MainActivity" />
         </activity>
-        <activity android:name=".TermDetailActivity"></activity>
+        <activity
+            android:name=".TermEditActivity"
+            android:label="@string/title_activity_term_details"
+            android:parentActivityName=".TermListActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.samuelraynor.app.c196_samuelraynor.feature.TermListActivity" />
+        </activity>
+        <activity
+            android:name=".TermDetailActivity"
+            android:label="@string/title_activity_term_details"
+            android:parentActivityName=".TermListActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.samuelraynor.app.c196_samuelraynor.feature.TermListActivity" />
+        </activity>
+        <activity
+            android:name=".CourseDetailActivity"
+            android:label="@string/title_activity_course_detail"
+            android:parentActivityName=".TermDetailActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.samuelraynor.app.c196_samuelraynor.feature.TermDetailActivity" />
+        </activity>
+        <activity
+            android:name=".CourseEditActivity"
+            android:label="@string/title_activity_course_edit"
+            android:parentActivityName=".TermDetailActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.samuelraynor.app.c196_samuelraynor.feature.TermDetailActivity" />
+        </activity>
     </application>
 
 </manifest>

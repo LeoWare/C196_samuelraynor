@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">C196_samuelraynor</string>
-    <string name="title_activity_terms">TermsActivity</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_course_detail">CourseDetailActivity</string>
+    <string name="title_activity_course_edit">CourseEditActivity</string>
 </resources>

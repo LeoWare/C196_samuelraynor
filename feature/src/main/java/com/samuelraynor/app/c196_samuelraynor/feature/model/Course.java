@@ -1,14 +1,25 @@
-package com.samuelraynor.app.c196_samuelraynor.feature;
+/*
+ * Copyright (c) 2018. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+ * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
+ * Etiam sed turpis ac ipsum condimentum fringilla. Maecenas magna.
+ * Proin dapibus sapien vel ante. Aliquam erat volutpat. Pellentesque sagittis ligula eget metus.
+ * Vestibulum commodo. Ut rhoncus gravida arcu.
+ */
+
+package com.samuelraynor.app.c196_samuelraynor.feature.model;
 
 import android.support.annotation.StringDef;
 
+import com.samuelraynor.app.c196_samuelraynor.feature.Assessment;
+
+import java.io.Serializable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Date;
 
 
-public class Course {
+public class Course implements Serializable {
 
 
     private String name;
@@ -21,8 +32,20 @@ public class Course {
     private String status;
 
     private ArrayList<Assessment> assessmentArrayList;
-    
+
     private ArrayList<CourseNote> notesArrayList;
+    private long id;
+
+    public Course() {
+        Date today = new Date();
+        this.name = "New Course";
+        this.start = today;
+        this.end = today;
+        this.status = PLAN_TO_TAKE;
+        this.mentorArrayList = new ArrayList<>();
+        this.assessmentArrayList = new ArrayList<>();
+        this.notesArrayList = new ArrayList<>();
+    }
 
     public Course(String name, Date start, Date end, String status) {
         this.name = name;
@@ -42,6 +65,14 @@ public class Course {
         this.status = status;
         this.assessmentArrayList = assessmentArrayList;
         this.notesArrayList = notesArrayList;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public long getId() {
+        return id;
     }
 
     public String getName() {
@@ -79,15 +110,15 @@ public class Course {
     public void addMentor(Mentor mentor) {
         this.mentorArrayList.add(mentor);
     }
-    
+
     public void removeMentor(Mentor mentor) {
         this.mentorArrayList.remove(mentor);
     }
-    
+
     public void clearMentors() {
         this.mentorArrayList.clear();
     }
-    
+
     public ArrayList<Assessment> getAssessmentArrayList() {
         return assessmentArrayList;
     }
@@ -107,6 +138,7 @@ public class Course {
     public void clearAssessments() {
         this.assessmentArrayList.clear();
     }
+
     @Status
     public String getStatus() {
         return this.status;
@@ -135,10 +167,11 @@ public class Course {
     public void clearNotess() {
         this.notesArrayList.clear();
     }
-    
-    @StringDef ({PLAN_TO_TAKE, IN_PROGRESS, COMPLETED, DROPPED})
+
+    @StringDef({PLAN_TO_TAKE, IN_PROGRESS, COMPLETED, DROPPED})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Status {}
+    public @interface Status {
+    }
 
     public static final String PLAN_TO_TAKE = "Plan to take";
     public static final String IN_PROGRESS = "In progress";

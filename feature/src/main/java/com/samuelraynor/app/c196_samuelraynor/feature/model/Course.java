@@ -35,6 +35,7 @@ public class Course implements Serializable {
 
     private ArrayList<CourseNote> notesArrayList;
     private long id;
+    private long termId;
 
     public Course() {
         Date today = new Date();
@@ -164,8 +165,16 @@ public class Course implements Serializable {
         this.notesArrayList.remove(note);
     }
 
-    public void clearNotess() {
+    public void clearNotes() {
         this.notesArrayList.clear();
+    }
+
+    public void setTermId(long termId) {
+        this.termId = termId;
+    }
+
+    public long getTermId() {
+        return termId;
     }
 
     @StringDef({PLAN_TO_TAKE, IN_PROGRESS, COMPLETED, DROPPED})

@@ -10,21 +10,22 @@ package com.samuelraynor.app.c196_samuelraynor.feature.database;
 
 import android.provider.BaseColumns;
 
-public final class CoursesContract {
+public class AssessmentsContract {
     // To prevent someone from accidentally instantiating the contract class,
     // make the constructor private.
-    private CoursesContract() {
+    private AssessmentsContract() {
     }
 
     /* Inner class that defines the table contents */
-    public static class CoursesEntry implements BaseColumns {
-        public static final String TABLE_NAME = "courses";
+    public static class AssessmentsEntry implements BaseColumns {
+        public static final String TABLE_NAME = "assessments";
         public static final String _ID = BaseColumns._ID;
-        public static final String COLUMN_NAME_TERM_ID = "term_id";
+        public static final String COLUMN_NAME_COURSE_ID = "course_id";
         public static final String COLUMN_NAME_TITLE = "title";
-        public static final String COLUMN_NAME_START = "start_date";
-        public static final String COLUMN_NAME_END = "end_date";
-        public static final String COLUMN_NAME_STATUS = "status";
+        public static final String COLUMN_NAME_TYPE = "type";
+        public static final String COLUMN_NAME_DUE = "due_date";
+
 
     }
+
 }

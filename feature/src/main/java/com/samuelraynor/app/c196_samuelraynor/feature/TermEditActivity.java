@@ -103,7 +103,6 @@ public class TermEditActivity extends AppCompatActivity {
 
     @Override
     protected Dialog onCreateDialog(int id) {
-        // TODO Auto-generated method stub
         if (id == 999) {
             SimpleDateFormat formatter = new SimpleDateFormat();
             formatter.applyPattern("yyyy");

@@ -225,7 +225,7 @@ public class CourseEditActivity extends AppCompatActivity {
     private void handleDelete() {
         try {
             studentData.deleteCourse(selectedCourse.getId());
-        } catch (StudentData.TermHasCoursesException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         setResult(RESULT_FIRST_USER);
@@ -241,10 +241,11 @@ public class CourseEditActivity extends AppCompatActivity {
 
             TextView _tvStartDate = findViewById(R.id.tvStartDate);
             TextView _tvEndDate = findViewById(R.id.tvEndDate);
-            String _name = (((TextInputEditText) findViewById(R.id.tvTermTitle)).getText()).toString();
+            String _name = (((TextInputEditText) findViewById(R.id.tvTitle)).getText()).toString();
             String _status = ((Spinner) findViewById(R.id.sStatus)).getSelectedItem().toString();
             try {
                 selectedCourse = new Course();
+                selectedCourse.setId(termId);
                 selectedCourse.setName(_name);
                 selectedCourse.setStart(formatter.parse((String) _tvStartDate.getText()));
                 selectedCourse.setEnd(formatter.parse((String) _tvEndDate.getText()));
@@ -258,7 +259,7 @@ public class CourseEditActivity extends AppCompatActivity {
         } else if (this.action.equals("INFO")) {
 
             try {
-                selectedCourse.setName((((TextInputEditText) findViewById(R.id.tvTermTitle)).getText()).toString());
+                selectedCourse.setName((((TextInputEditText) findViewById(R.id.tvTitle)).getText()).toString());
                 TextView tvStartDate = findViewById(R.id.tvStartDate);
                 selectedCourse.setStart(formatter.parse((String) tvStartDate.getText()));
                 TextView tvEndDate = findViewById(R.id.tvEndDate);
@@ -272,7 +273,7 @@ public class CourseEditActivity extends AppCompatActivity {
             this.studentData.updateCourse(selectedCourse);
         }
         Intent returnIntent = new Intent();
-        returnIntent.putExtra("TERM", selectedCourse);
+        returnIntent.putExtra("COURSE", selectedCourse);
         setResult(RESULT_OK, returnIntent);
         finish();
     }

@@ -33,7 +33,7 @@ public class Course implements Serializable {
 
     private ArrayList<Assessment> assessmentArrayList;
 
-    private ArrayList<CourseNote> notesArrayList;
+    private ArrayList<Note> notesArrayList;
     private long id;
     private long termId;
 
@@ -58,7 +58,7 @@ public class Course implements Serializable {
         this.notesArrayList = new ArrayList<>();
     }
 
-    public Course(String name, Date start, Date end, ArrayList<Mentor> mentorArrayList, String status, ArrayList<Assessment> assessmentArrayList, ArrayList<CourseNote> notesArrayList) {
+    public Course(String name, Date start, Date end, ArrayList<Mentor> mentorArrayList, String status, ArrayList<Assessment> assessmentArrayList, ArrayList<Note> notesArrayList) {
         this.name = name;
         this.start = start;
         this.end = end;
@@ -149,19 +149,19 @@ public class Course implements Serializable {
         this.status = status;
     }
 
-    public ArrayList<CourseNote> getNotesArrayList() {
+    public ArrayList<Note> getNotesArrayList() {
         return notesArrayList;
     }
 
-    public void setNotesArrayList(ArrayList<CourseNote> notesArrayList) {
+    public void setNotesArrayList(ArrayList<Note> notesArrayList) {
         this.notesArrayList = notesArrayList;
     }
 
-    public void addNote(CourseNote note) {
+    public void addNote(Note note) {
         this.notesArrayList.add(note);
     }
 
-    public void removeNote(CourseNote note) {
+    public void removeNote(Note note) {
         this.notesArrayList.remove(note);
     }
 

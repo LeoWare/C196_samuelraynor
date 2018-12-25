@@ -31,6 +31,9 @@ import java.util.Date;
 
 public class TermDetailActivity extends AppCompatActivity {
 
+    private final static int REQUESTCODE_TERM=1;
+    private final static int REQUESTCODE_COURSE=2;
+
     protected Term selectedTerm;
     protected long termId;
     protected ListView courseList;
@@ -75,6 +78,8 @@ public class TermDetailActivity extends AppCompatActivity {
         // Set the ListView content
         courseList = findViewById(R.id.courseListView);
 
+        // get the courseinfo from the database
+        courseInfo = studentData.getCoursesByTermId(this.selectedTerm.getId());
         TermDetailActivity.CourseAdapter courseListAdapter = new TermDetailActivity.CourseAdapter(this, courseInfo);
 
         courseList.setAdapter(courseListAdapter);
@@ -82,10 +87,21 @@ public class TermDetailActivity extends AppCompatActivity {
 
     }
 
+    public void updateCourseInfoList() {
+        // get the courseinfo from the database
+        StudentData studentData = new StudentData(this);
+        ArrayList<Course> courseInfo = studentData.getCoursesByTermId(this.selectedTerm.getId());
+
+        TermDetailActivity.CourseAdapter courseListAdapter = new TermDetailActivity.CourseAdapter(this, courseInfo);
+        courseList.setAdapter(courseListAdapter);
+        courseList.setOnItemClickListener(getOnItemClickListener());
+    }
+
     public void addCourse(View view) {
         Intent addIntent = new Intent(this, CourseEditActivity.class);
         addIntent.putExtra("ACTION", "NEW");
-        startActivityForResult(addIntent, 2);
+        addIntent.putExtra("TERM", selectedTerm.getId());
+        startActivityForResult(addIntent, REQUESTCODE_COURSE);
     }
 
     private AdapterView.OnItemClickListener getOnItemClickListener() {
@@ -95,7 +111,7 @@ public class TermDetailActivity extends AppCompatActivity {
                 Course selectedCourse = (Course) courseList.getItemAtPosition(position);
                 Intent courseDetailIntent = new Intent(parent.getContext(), CourseDetailActivity.class);
                 courseDetailIntent.putExtra("COURSE", selectedCourse);
-                startActivityForResult(courseDetailIntent, 1);
+                startActivityForResult(courseDetailIntent, REQUESTCODE_TERM);
             }
         };
     }
@@ -124,22 +140,29 @@ public class TermDetailActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (resultCode == RESULT_OK) {
-            // user clicked save
-            Term savedTerm = (Term) data.getSerializableExtra("TERM");
-            selectedTerm = savedTerm;
-            showTitle(savedTerm.getTitle());
-            showStartDate(savedTerm.getStart());
-            showEndDate(savedTerm.getEnd());
-        } else if (resultCode == RESULT_CANCELED) {
-            // do nothing
-        } else if (resultCode == RESULT_FIRST_USER) {
-            // user deleted the record
-            // finish the activity
-            setResult(resultCode);
-            finish();
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == REQUESTCODE_TERM) {
+            if (resultCode == RESULT_OK) {
+                // user clicked save
+                Term savedTerm = (Term) data.getSerializableExtra("TERM");
+                selectedTerm = savedTerm;
+                showTitle(savedTerm.getTitle());
+                showStartDate(savedTerm.getStart());
+                showEndDate(savedTerm.getEnd());
+            } else if (resultCode == RESULT_CANCELED) {
+                // do nothing
+            } else if (resultCode == RESULT_FIRST_USER) {
+                // user deleted the record
+                // finish the activity
+                setResult(resultCode);
+                finish();
+            } else {
+                super.onActivityResult(requestCode, resultCode, data);
+            }
+            updateCourseInfoList();
+        } else if (requestCode == REQUESTCODE_COURSE) {
+            if (resultCode == RESULT_OK) {
+                updateCourseInfoList();
+            }
         }
     }
 

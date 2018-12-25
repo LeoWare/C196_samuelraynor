@@ -15,6 +15,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.samuelraynor.app.c196_samuelraynor.feature.model.Course;
+import com.samuelraynor.app.c196_samuelraynor.feature.model.Mentor;
+import com.samuelraynor.app.c196_samuelraynor.feature.model.Note;
 import com.samuelraynor.app.c196_samuelraynor.feature.model.Term;
 
 import java.lang.reflect.Array;
@@ -25,7 +27,7 @@ import java.util.Date;
 
 public class StudentData extends SQLiteOpenHelper {
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 3;
+    public static final int DATABASE_VERSION = 4;
     public static final String DATABASE_NAME = "StudentData.db";
 
     private static final String SQL_CREATE_TERMS =
@@ -41,6 +43,7 @@ public class StudentData extends SQLiteOpenHelper {
     private static final String SQL_CREATE_COURSES =
             "CREATE TABLE " + CoursesContract.CoursesEntry.TABLE_NAME + " (" +
                     CoursesContract.CoursesEntry._ID + " INTEGER PRIMARY KEY," +
+                    CoursesContract.CoursesEntry.COLUMN_NAME_TERM_ID + " INTEGER," +
                     CoursesContract.CoursesEntry.COLUMN_NAME_TITLE + " TEXT," +
                     CoursesContract.CoursesEntry.COLUMN_NAME_START + " DATE," +
                     CoursesContract.CoursesEntry.COLUMN_NAME_END + " DATE," +
@@ -75,10 +78,11 @@ public class StudentData extends SQLiteOpenHelper {
                     NotesContract.NotesEntry.COLUMN_NAME_COURSE_ID + " INTEGER," +
                     AssessmentsContract.AssessmentsEntry.COLUMN_NAME_TITLE + " TEXT," +
                     AssessmentsContract.AssessmentsEntry.COLUMN_NAME_TYPE + " DATE," +
-                    AssessmentsContract.AssessmentsEntry.COLUMN_NAME_DUE + " DATE)";;
+                    AssessmentsContract.AssessmentsEntry.COLUMN_NAME_DUE + " DATE)";
+    ;
 
     private static final String SQL_DELETE_ASSESSMENTS =
-            "DROP TABLE IF EXISTS " + CoursesContract.CoursesEntry.TABLE_NAME;
+            "DROP TABLE IF EXISTS " + AssessmentsContract.AssessmentsEntry.TABLE_NAME;
 
     public StudentData(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -266,6 +270,9 @@ public class StudentData extends SQLiteOpenHelper {
         return returnValue;
     }
 
+    public class TermHasCoursesException extends Exception {
+    }
+
     public ArrayList<Course> getAllCourses() {
         // Gets the data repository in read mode
         SQLiteDatabase db = this.getReadableDatabase();
@@ -274,6 +281,7 @@ public class StudentData extends SQLiteOpenHelper {
         // columns from 'courses'
         String[] columns_courses = {
                 CoursesContract.CoursesEntry._ID,
+                CoursesContract.CoursesEntry.COLUMN_NAME_TERM_ID,
                 CoursesContract.CoursesEntry.COLUMN_NAME_TITLE,
                 CoursesContract.CoursesEntry.COLUMN_NAME_START,
                 CoursesContract.CoursesEntry.COLUMN_NAME_END,
@@ -283,22 +291,34 @@ public class StudentData extends SQLiteOpenHelper {
 
         // columns from 'mentors'
         String[] columns_mentors = {
-                CoursesContract.CoursesEntry._ID,
-                CoursesContract.CoursesEntry.COLUMN_NAME_TITLE,
-                CoursesContract.CoursesEntry.COLUMN_NAME_START,
-                CoursesContract.CoursesEntry.COLUMN_NAME_END,
-                CoursesContract.CoursesEntry.COLUMN_NAME_STATUS,
+                MentorsContract.MentorsEntry._ID,
+                MentorsContract.MentorsEntry.COLUMN_NAME_COURSE_ID,
+                MentorsContract.MentorsEntry.COLUMN_NAME_NAME,
+                MentorsContract.MentorsEntry.COLUMN_NAME_PHONE,
+                MentorsContract.MentorsEntry.COLUMN_NAME_EMAIL,
 
         };
 
         // columns from 'notes'
+        String[] columns_notes = {
+                NotesContract.NotesEntry._ID,
+                NotesContract.NotesEntry.COLUMN_NAME_COURSE_ID,
+                NotesContract.NotesEntry.COLUMN_NAME_NOTE,
 
+        };
 
         // columns from 'assessments'
+        String[] columns_assessments = {
+                AssessmentsContract.AssessmentsEntry._ID,
+                AssessmentsContract.AssessmentsEntry.COLUMN_NAME_COURSE_ID,
+                AssessmentsContract.AssessmentsEntry.COLUMN_NAME_TITLE,
+                AssessmentsContract.AssessmentsEntry.COLUMN_NAME_TYPE,
+                AssessmentsContract.AssessmentsEntry.COLUMN_NAME_DUE,
 
+        };
 
         Cursor cursor_courses = db.query(
-                TermsContract.TermsEntry.TABLE_NAME,   // The table to query
+                CoursesContract.CoursesEntry.TABLE_NAME,   // The table to query
                 columns_courses,             // The array of columns to return (pass null to get all)
                 null,              // The columns for the WHERE clause
                 null,          // The values for the WHERE clause
@@ -329,6 +349,12 @@ public class StudentData extends SQLiteOpenHelper {
             newItem.setStart(itemStart);
             newItem.setEnd(itemEnd);
 
+            // mentors
+            newItem.setMentorArrayList(this.getMentorsByCourseId(itemId));
+
+            // notes
+            newItem.setNotesArrayList(this.getNotesByCourseId(itemId));
+
             itemsList.add(newItem);
         }
         cursor_courses.close();
@@ -339,22 +365,23 @@ public class StudentData extends SQLiteOpenHelper {
         // Gets the data repository in read mode
         SQLiteDatabase db = this.getReadableDatabase();
 
-        // setup columns
+        // columns from 'courses'
         String[] columns = {
-                TermsContract.TermsEntry._ID,
-                TermsContract.TermsEntry.COLUMN_NAME_TITLE,
-                TermsContract.TermsEntry.COLUMN_NAME_START,
-                TermsContract.TermsEntry.COLUMN_NAME_END,
-
+                CoursesContract.CoursesEntry._ID,
+                CoursesContract.CoursesEntry.COLUMN_NAME_TERM_ID,
+                CoursesContract.CoursesEntry.COLUMN_NAME_TITLE,
+                CoursesContract.CoursesEntry.COLUMN_NAME_START,
+                CoursesContract.CoursesEntry.COLUMN_NAME_END,
+                CoursesContract.CoursesEntry.COLUMN_NAME_STATUS,
         };
 
         // Filter results WHERE "_id" = 1
-        String selection = TermsContract.TermsEntry._ID + " = ?";
+        String selection = CoursesContract.CoursesEntry._ID + " = ?";
         String[] selectionArgs = {String.valueOf(courseId)};
 
 
         Cursor cursor = db.query(
-                TermsContract.TermsEntry.TABLE_NAME,   // The table to query
+                CoursesContract.CoursesEntry.TABLE_NAME,   // The table to query
                 columns,             // The array of columns to return (pass null to get all)
                 selection,              // The columns for the WHERE clause
                 selectionArgs,          // The values for the WHERE clause
@@ -363,33 +390,109 @@ public class StudentData extends SQLiteOpenHelper {
                 null               // The sort order
         );
 
-        ArrayList<Course> coursesList = new ArrayList<>();
+        ArrayList<Course> itemsList = new ArrayList<>();
         while (cursor.moveToNext()) {
-            Course newCourse = null;
+            Course newItem = null;
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
 
             long itemId = cursor.getLong(
-                    cursor.getColumnIndexOrThrow(TermsContract.TermsEntry._ID));
-            String itemTitle = cursor.getString(cursor.getColumnIndexOrThrow(TermsContract.TermsEntry.COLUMN_NAME_TITLE));
+                    cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry._ID));
+            String itemTitle = cursor.getString(cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry.COLUMN_NAME_TITLE));
 
             Date itemStart = null, itemEnd = null;
             try {
-                itemStart = formatter.parse(cursor.getString(cursor.getColumnIndexOrThrow(TermsContract.TermsEntry.COLUMN_NAME_START)));
-                itemEnd = formatter.parse(cursor.getString(cursor.getColumnIndexOrThrow(TermsContract.TermsEntry.COLUMN_NAME_END)));
+                itemStart = formatter.parse(cursor.getString(cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry.COLUMN_NAME_START)));
+                itemEnd = formatter.parse(cursor.getString(cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry.COLUMN_NAME_END)));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
 
-            newCourse.setId(itemId);
-            newCourse.setName(itemTitle);
-            newCourse.setStart(itemStart);
-            newCourse.setEnd(itemEnd);
+            newItem.setId(itemId);
+            newItem.setName(itemTitle);
+            newItem.setStart(itemStart);
+            newItem.setEnd(itemEnd);
 
-            coursesList.add(newCourse);
+            // mentors
+            newItem.setMentorArrayList(this.getMentorsByCourseId(itemId));
+
+            // notes
+            newItem.setNotesArrayList(this.getNotesByCourseId(itemId));
+
+            itemsList.add(newItem);
         }
         cursor.close();
-        return coursesList.get(0);
+        return itemsList.get(0);
     }
+
+    public ArrayList<Course> getCoursesByTermId(long termId) {
+        // Gets the data repository in read mode
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // columns from 'courses'
+        String[] columns = {
+                CoursesContract.CoursesEntry._ID,
+                CoursesContract.CoursesEntry.COLUMN_NAME_TERM_ID,
+                CoursesContract.CoursesEntry.COLUMN_NAME_TITLE,
+                CoursesContract.CoursesEntry.COLUMN_NAME_START,
+                CoursesContract.CoursesEntry.COLUMN_NAME_END,
+                CoursesContract.CoursesEntry.COLUMN_NAME_STATUS,
+        };
+
+        // Filter results WHERE "_id" = 1
+        String selection = CoursesContract.CoursesEntry.COLUMN_NAME_TERM_ID + " = ?";
+        String[] selectionArgs = {String.valueOf(termId)};
+
+
+        Cursor cursor = db.query(
+                CoursesContract.CoursesEntry.TABLE_NAME,   // The table to query
+                columns,             // The array of columns to return (pass null to get all)
+                selection,              // The columns for the WHERE clause
+                selectionArgs,          // The values for the WHERE clause
+                null,                   // don't group the rows
+                null,                   // don't filter by row groups
+                null               // The sort order
+        );
+
+        ArrayList<Course> itemsList = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            Course newItem = new Course();
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
+
+            long itemId = cursor.getLong(
+                    cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry._ID));
+            String itemTitle = cursor.getString(cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry.COLUMN_NAME_TITLE));
+
+            Date itemStart = null, itemEnd = null;
+            try {
+                itemStart = formatter.parse(cursor.getString(cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry.COLUMN_NAME_START)));
+                itemEnd = formatter.parse(cursor.getString(cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry.COLUMN_NAME_END)));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            String itemStatus = new String(cursor.getString(cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry.COLUMN_NAME_STATUS)));
+
+
+            newItem.setId(itemId);
+            newItem.setTermId(cursor.getLong(cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry.COLUMN_NAME_TERM_ID)));
+            newItem.setName(itemTitle);
+            newItem.setStart(itemStart);
+            newItem.setEnd(itemEnd);
+            newItem.setStatus(itemStatus);
+
+            // mentors
+            newItem.setMentorArrayList(this.getMentorsByCourseId(itemId));
+
+            // notes
+            newItem.setNotesArrayList(this.getNotesByCourseId(itemId));
+
+            itemsList.add(newItem);
+        }
+        cursor.close();
+        return itemsList;
+    }
+
+
 
     public long addCourse(Course course) {
         // Gets the data repository in write mode
@@ -432,20 +535,103 @@ public class StudentData extends SQLiteOpenHelper {
         return returnValue;
     }
 
-    public int deleteCourse(long courseId) throws TermHasCoursesException {
+    public int deleteCourse(long courseId) {
         // Gets the data repository in write mode
         SQLiteDatabase db = this.getWritableDatabase();
 
         // x
         // Which row to update, based on the title
-        String selection = TermsContract.TermsEntry._ID + " = ?";
+        String selection = CoursesContract.CoursesEntry._ID + " = ?";
         String[] selectionArgs = {String.valueOf(courseId)};
 
-        int returnValue = db.delete(TermsContract.TermsEntry.TABLE_NAME, selection, selectionArgs);
+        int returnValue = db.delete(CoursesContract.CoursesEntry.TABLE_NAME, selection, selectionArgs);
         return returnValue;
     }
 
-    public class TermHasCoursesException extends Exception {
 
+    private ArrayList<Mentor> getMentorsByCourseId(long courseId) {
+        // Gets the data repository in read mode
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // columns from 'mentors'
+        String[] columns = {
+                MentorsContract.MentorsEntry._ID,
+                MentorsContract.MentorsEntry.COLUMN_NAME_COURSE_ID,
+                MentorsContract.MentorsEntry.COLUMN_NAME_NAME,
+                MentorsContract.MentorsEntry.COLUMN_NAME_PHONE,
+                MentorsContract.MentorsEntry.COLUMN_NAME_EMAIL,
+        };
+
+        // Filter results WHERE "_id" = 1
+        String selection = MentorsContract.MentorsEntry.COLUMN_NAME_COURSE_ID + " = ?";
+        String[] selectionArgs = {String.valueOf(courseId)};
+
+
+        Cursor cursor = db.query(
+                MentorsContract.MentorsEntry.TABLE_NAME,   // The table to query
+                columns,             // The array of columns to return (pass null to get all)
+                selection,              // The columns for the WHERE clause
+                selectionArgs,          // The values for the WHERE clause
+                null,                   // don't group the rows
+                null,                   // don't filter by row groups
+                null               // The sort order
+        );
+
+        ArrayList<Mentor> itemsList = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            Mentor newItem = new Mentor();
+
+            newItem.setId(cursor.getLong(cursor.getColumnIndexOrThrow(MentorsContract.MentorsEntry._ID)));
+            newItem.setCourseId(cursor.getLong(cursor.getColumnIndexOrThrow(MentorsContract.MentorsEntry.COLUMN_NAME_COURSE_ID)));
+            newItem.setName(cursor.getString(cursor.getColumnIndexOrThrow(MentorsContract.MentorsEntry.COLUMN_NAME_NAME)));
+            newItem.setPhone(cursor.getString(cursor.getColumnIndexOrThrow(MentorsContract.MentorsEntry.COLUMN_NAME_PHONE)));
+            newItem.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(MentorsContract.MentorsEntry.COLUMN_NAME_EMAIL)));
+
+            itemsList.add(newItem);
+        }
+        cursor.close();
+        return itemsList;
     }
+
+    private ArrayList<Note> getNotesByCourseId(long courseId) {
+        // Gets the data repository in read mode
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // columns from 'mentors'
+        String[] columns = {
+                NotesContract.NotesEntry._ID,
+                NotesContract.NotesEntry.COLUMN_NAME_COURSE_ID,
+                NotesContract.NotesEntry.COLUMN_NAME_NOTE,
+        };
+
+        // Filter results WHERE "_id" = 1
+        String selection = NotesContract.NotesEntry.COLUMN_NAME_COURSE_ID + " = ?";
+        String[] selectionArgs = {String.valueOf(courseId)};
+
+
+        Cursor cursor = db.query(
+                NotesContract.NotesEntry.TABLE_NAME,   // The table to query
+                columns,             // The array of columns to return (pass null to get all)
+                selection,              // The columns for the WHERE clause
+                selectionArgs,          // The values for the WHERE clause
+                null,                   // don't group the rows
+                null,                   // don't filter by row groups
+                null               // The sort order
+        );
+
+        ArrayList<Note> itemsList = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            Note newItem = new Note();
+
+            newItem.setId(cursor.getLong(cursor.getColumnIndexOrThrow(NotesContract.NotesEntry._ID)));
+            newItem.setCourseId(cursor.getLong(cursor.getColumnIndexOrThrow(NotesContract.NotesEntry.COLUMN_NAME_COURSE_ID)));
+            newItem.setNote(cursor.getString(cursor.getColumnIndexOrThrow(NotesContract.NotesEntry.COLUMN_NAME_NOTE)));
+
+
+            itemsList.add(newItem);
+        }
+        cursor.close();
+        return itemsList;
+    }
+
 }

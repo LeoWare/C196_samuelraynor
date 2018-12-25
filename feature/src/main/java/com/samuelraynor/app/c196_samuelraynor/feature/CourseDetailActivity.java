@@ -52,29 +52,6 @@ public class CourseDetailActivity extends AppCompatActivity {
         courseList = findViewById(R.id.examsListView);
         SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
 
-        Course newCourse1 = null;
-        Course newCourse2 = null;
-        Course newCourse3 = null;
-        try {
-            newCourse1 = new Course("Course 1", formatter.parse("01-01-2018"), formatter.parse("30-06-2018"), Course.PLAN_TO_TAKE);
-            newCourse2 = new Course("Course 2", formatter.parse("01-07-2018"), formatter.parse("31-12-2018"), Course.PLAN_TO_TAKE);
-            newCourse3 = new Course("Course 3", formatter.parse("01-01-2019"), formatter.parse("31-06-2019"), Course.PLAN_TO_TAKE);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        courseInfo.add(newCourse1);
-        courseInfo.add(newCourse2);
-        courseInfo.add(newCourse3);
-        courseInfo.add(newCourse1);
-        courseInfo.add(newCourse2);
-        courseInfo.add(newCourse3);
-        courseInfo.add(newCourse1);
-        courseInfo.add(newCourse2);
-        courseInfo.add(newCourse3);
-        courseInfo.add(newCourse1);
-        courseInfo.add(newCourse2);
-        courseInfo.add(newCourse3);
 
         CourseDetailActivity.CourseAdapter courseListAdapter = new CourseDetailActivity.CourseAdapter(this, courseInfo);
 

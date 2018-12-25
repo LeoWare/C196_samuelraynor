@@ -15,11 +15,19 @@ public class Mentor implements Serializable {
     private String name;
     private String phone;
     private String email;
+    private long id;
+    private long courseId;
 
     public Mentor(String name, String phone, String email) {
         this.name = name;
         this.phone = phone;
         this.email = email;
+    }
+
+    public Mentor() {
+        this.name = "Mentor Name";
+        this.phone = "555-555-1212";
+        this.email = "mymentor@mentorcentral.wgu";
     }
 
     public String getName() {
@@ -53,5 +61,21 @@ public class Mentor implements Serializable {
                 ", phone='" + phone + '\'' +
                 ", email='" + email + '\'' +
                 '}';
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setCourseId(long courseId) {
+        this.courseId = courseId;
+    }
+
+    public long getCourseId() {
+        return courseId;
     }
 }

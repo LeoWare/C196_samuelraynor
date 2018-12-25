@@ -10,21 +10,32 @@ package com.samuelraynor.app.c196_samuelraynor.feature.model;
 
 import java.io.Serializable;
 
-public class CourseNote implements Serializable {
-    private int noteId;
-    private String text;
+public class Note implements Serializable {
+    private long id;
+    private String note;
+    private long courseId;
 
-    public CourseNote(int noteId, String text) {
-        this.noteId = noteId;
-        this.text = text;
+    public void setId(long id) {
+        this.id = id;
     }
 
-    @Override
-    public String toString() {
-        return "CourseNote{" +
-                "noteId=" + noteId +
-                ", text='" + text + '\'' +
-                '}';
+    public long getId() {
+        return id;
     }
 
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setCourseId(long courseId) {
+        this.courseId = courseId;
+    }
+
+    public long getCourseId() {
+        return courseId;
+    }
 }

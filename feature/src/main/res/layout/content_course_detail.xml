@@ -102,6 +102,7 @@
         style="@style/TextAppearance.AppCompat.Large"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/general_margin"
         android:text="Course Mentors"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textStatusLabel" />
@@ -136,6 +137,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintRight_toRightOf="parent" />-->
 
+    <Button
+        android:id="@+id/btnAddMentor"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:onClick="cmdAddMentor"
+        android:padding="0dp"
+        android:text="+"
+        app:layout_constraintBaseline_toBaselineOf="@+id/textMentorLabel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
     <ListView
         android:id="@+id/mentorsListView"
         android:layout_width="0dp"
@@ -151,14 +163,25 @@
         android:id="@+id/textNotesLabel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/general_margin"
         android:text="Notes"
-        app:layout_constraintTop_toBottomOf="@+id/mentorsListView"
         app:layout_constraintBottom_toTopOf="@+id/notesListView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mentorsListView" />
 
+    <Button
+        android:id="@+id/btnAddNote"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:onClick="cmdAddNote"
+        android:padding="0dp"
+        android:text="+"
+        app:layout_constraintBaseline_toBaselineOf="@+id/textNotesLabel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
 
     <ListView
         android:id="@+id/notesListView"
@@ -175,13 +198,24 @@
         android:id="@+id/textExamsLabel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/general_margin"
         android:text="Exams"
-        app:layout_constraintTop_toBottomOf="@+id/notesListView"
         app:layout_constraintBottom_toTopOf="@+id/examsListView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/notesListView" />
+    <Button
+        android:id="@+id/btnAddExam"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:onClick="cmdAddExam"
+        android:padding="0dp"
+        android:text="+"
+        app:layout_constraintBaseline_toBaselineOf="@+id/textExamsLabel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
 
     <ListView
         android:id="@+id/examsListView"

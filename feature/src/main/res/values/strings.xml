@@ -25,4 +25,6 @@
     <string name="course_title">Course Title</string>
     <string name="status">Status: </string>
     <string name="mentor">Mentor: </string>
+    <string name="phoneLabel">Phone:</string>
+    <string name="emailLabel">Email:</string>
 </resources>

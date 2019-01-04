@@ -3,10 +3,10 @@ package com.samuelraynor.app.c196_samuelraynor.feature;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -136,7 +136,7 @@ public class TermEditActivity extends AppCompatActivity {
                 @Override
                 public void onDateSet(DatePicker arg0,
                                       int arg1, int arg2, int arg3) {
-                    SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+                    SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
                     Date date = null;
                     try {
                         date = formatter.parse(String.format("%2d/%2d/%4d", arg2 + 1, arg3, arg1));
@@ -152,7 +152,7 @@ public class TermEditActivity extends AppCompatActivity {
                 @Override
                 public void onDateSet(DatePicker arg0,
                                       int arg1, int arg2, int arg3) {
-                    SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+                    SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
                     Date date = null;
                     try {
                         date = formatter.parse(String.format("%2d/%2d/%4d", arg2 + 1, arg3, arg1));
@@ -175,7 +175,7 @@ public class TermEditActivity extends AppCompatActivity {
     }
 
     private void showDate(TextView tv, Date date) {
-        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
         tv.setText(formatter.format(date));
     }
 

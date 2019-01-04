@@ -20,6 +20,7 @@ import com.samuelraynor.app.c196_samuelraynor.feature.model.Term;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class TermListActivity extends AppCompatActivity {
 
@@ -116,7 +117,7 @@ public class TermListActivity extends AppCompatActivity {
             TextView tvStart = (TextView) convertView.findViewById(R.id.tvStart);
             TextView tvEnd = (TextView) convertView.findViewById(R.id.tvEnd);
 
-            SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+            SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
             tvName.setText(term.getTitle());
             tvStart.setText("Start: ".concat(formatter.format(term.getStart())));
             tvEnd.setText("End: ".concat(formatter.format(term.getEnd())));

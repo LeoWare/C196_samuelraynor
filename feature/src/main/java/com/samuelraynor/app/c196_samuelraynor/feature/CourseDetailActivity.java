@@ -1,13 +1,11 @@
 package com.samuelraynor.app.c196_samuelraynor.feature;
 
 import android.app.Activity;
-import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -20,7 +18,6 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -625,7 +622,7 @@ public class CourseDetailActivity extends AppCompatActivity {
             save.setOnClickListener(this);
             cancel.setOnClickListener(this);
 
-            SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+            SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
 
             // Populate the spinner
             Spinner type = findViewById(R.id.sType);
@@ -665,7 +662,7 @@ public class CourseDetailActivity extends AppCompatActivity {
 
         protected void handleSave(View view) {
             StudentData studentData = new StudentData(this.parentActivity);
-            SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+            SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
             // save the record and dismiss
 
             assessment.setCourseId(this.courseId);

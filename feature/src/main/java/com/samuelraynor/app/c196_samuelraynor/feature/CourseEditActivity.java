@@ -12,8 +12,6 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -23,13 +21,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.samuelraynor.app.c196_samuelraynor.feature.database.StudentData;
 import com.samuelraynor.app.c196_samuelraynor.feature.model.Course;
-import com.samuelraynor.app.c196_samuelraynor.feature.model.Term;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -173,7 +169,7 @@ public class CourseEditActivity extends AppCompatActivity {
                 @Override
                 public void onDateSet(DatePicker arg0,
                                       int arg1, int arg2, int arg3) {
-                    SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+                    SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
                     Date date = null;
                     try {
                         date = formatter.parse(String.format("%2d/%2d/%4d", arg2 + 1, arg3, arg1));
@@ -189,7 +185,7 @@ public class CourseEditActivity extends AppCompatActivity {
                 @Override
                 public void onDateSet(DatePicker arg0,
                                       int arg1, int arg2, int arg3) {
-                    SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+                    SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
                     Date date = null;
                     try {
                         date = formatter.parse(String.format("%2d/%2d/%4d", arg2 + 1, arg3, arg1));
@@ -212,7 +208,7 @@ public class CourseEditActivity extends AppCompatActivity {
     }
 
     private void showDate(TextView tv, Date date) {
-        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
         tv.setText(formatter.format(date));
     }
 

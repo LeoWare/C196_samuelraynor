@@ -8,7 +8,6 @@
 
 package com.samuelraynor.app.c196_samuelraynor.feature.model;
 
-import android.app.ActivityManager;
 import android.support.annotation.StringDef;
 
 import java.io.Serializable;
@@ -16,6 +15,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class Assessment implements Serializable {
 
@@ -44,7 +44,7 @@ public class Assessment implements Serializable {
 
     @Override
     public String toString() {
-        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
 
         return "Assessment{" +
                 "id='" + this.id + '\'' +

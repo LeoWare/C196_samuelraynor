@@ -20,7 +20,6 @@ import com.samuelraynor.app.c196_samuelraynor.feature.model.Mentor;
 import com.samuelraynor.app.c196_samuelraynor.feature.model.Note;
 import com.samuelraynor.app.c196_samuelraynor.feature.model.Term;
 
-import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -139,7 +138,7 @@ public class StudentData extends SQLiteOpenHelper {
         ArrayList<Term> termsList = new ArrayList<>();
         while (cursor.moveToNext()) {
             Term newTerm = new Term();
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/DD", Locale.US);
 
             long itemId = cursor.getLong(
                     cursor.getColumnIndexOrThrow(TermsContract.TermsEntry._ID));
@@ -195,7 +194,7 @@ public class StudentData extends SQLiteOpenHelper {
         ArrayList<Term> termsList = new ArrayList<>();
         while (cursor.moveToNext()) {
             Term newTerm = new Term();
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/DD", Locale.US);
 
             long itemId = cursor.getLong(
                     cursor.getColumnIndexOrThrow(TermsContract.TermsEntry._ID));
@@ -225,7 +224,7 @@ public class StudentData extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // date formatter
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/DD", Locale.US);
 
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
@@ -243,7 +242,7 @@ public class StudentData extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // date formatter
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/DD", Locale.US);
 
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
@@ -357,7 +356,7 @@ public class StudentData extends SQLiteOpenHelper {
         ArrayList<Course> itemsList = new ArrayList<>();
         while (cursor_courses.moveToNext()) {
             Course newItem = new Course();
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/DD", Locale.US);
 
             long itemId = cursor_courses.getLong(
                     cursor_courses.getColumnIndexOrThrow(CoursesContract.CoursesEntry._ID));
@@ -420,7 +419,7 @@ public class StudentData extends SQLiteOpenHelper {
         ArrayList<Course> itemsList = new ArrayList<>();
         while (cursor.moveToNext()) {
             Course newItem = new Course();
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/DD", Locale.US);
 
             long itemId = cursor.getLong(
                     cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry._ID));
@@ -483,7 +482,7 @@ public class StudentData extends SQLiteOpenHelper {
         ArrayList<Course> itemsList = new ArrayList<>();
         while (cursor.moveToNext()) {
             Course newItem = new Course();
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/DD", Locale.US);
 
             long itemId = cursor.getLong(
                     cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry._ID));
@@ -525,7 +524,7 @@ public class StudentData extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // date formatter
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/DD", Locale.US);
 
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
@@ -544,7 +543,7 @@ public class StudentData extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // date formatter
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/DD", Locale.US);
 
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
@@ -902,7 +901,7 @@ public class StudentData extends SQLiteOpenHelper {
         ArrayList<Assessment> itemsList = new ArrayList<>();
         while (cursor.moveToNext()) {
             Assessment newItem = new Assessment();
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/DD", Locale.US);
 
             newItem.setId(cursor.getLong(cursor.getColumnIndexOrThrow(AssessmentsContract.AssessmentsEntry._ID)));
             newItem.setCourseId(cursor.getLong(cursor.getColumnIndexOrThrow(AssessmentsContract.AssessmentsEntry.COLUMN_NAME_COURSE_ID)));
@@ -926,7 +925,7 @@ public class StudentData extends SQLiteOpenHelper {
         // Gets the data repository in write mode
         SQLiteDatabase db = this.getWritableDatabase();
 
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/DD", Locale.US);
 
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
@@ -944,7 +943,7 @@ public class StudentData extends SQLiteOpenHelper {
         // Gets the data repository in read mode
         SQLiteDatabase db = this.getReadableDatabase();
 
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/DD", Locale.US);
 
         // columns from 'assessments'
         String[] columns = {
@@ -1001,7 +1000,7 @@ public class StudentData extends SQLiteOpenHelper {
         // Gets the data repository in write mode
         SQLiteDatabase db = this.getWritableDatabase();
 
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/DD", Locale.US);
 
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();

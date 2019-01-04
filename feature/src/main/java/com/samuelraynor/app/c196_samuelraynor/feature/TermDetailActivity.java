@@ -2,11 +2,9 @@ package com.samuelraynor.app.c196_samuelraynor.feature;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -28,8 +26,6 @@ import com.samuelraynor.app.c196_samuelraynor.feature.model.Term;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 public class TermDetailActivity extends AppCompatActivity {
@@ -135,7 +131,7 @@ public class TermDetailActivity extends AppCompatActivity {
     }
 
     private void showDate(TextView tv, Date date) {
-        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
         tv.setText(formatter.format(date));
     }
 

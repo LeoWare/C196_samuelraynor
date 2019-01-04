@@ -20,7 +20,7 @@ public class Term implements Serializable {
     private Date start;
     private Date end;
 
-    private ArrayList<Course> courseArrayList;
+    //private ArrayList<Course> courseArrayList;
 
     /**
      *
@@ -30,7 +30,7 @@ public class Term implements Serializable {
         this.name = "New Term";
         this.start = new Date();
         this.end = new Date();
-        this.courseArrayList = new ArrayList<>();
+        //this.courseArrayList = new ArrayList<>();
     }
 
     /**
@@ -43,7 +43,7 @@ public class Term implements Serializable {
         this.name = name;
         this.start = start;
         this.end = end;
-        this.courseArrayList = new ArrayList<>();
+        //this.courseArrayList = new ArrayList<>();
     }
 
     public long getId() {
@@ -99,22 +99,22 @@ public class Term implements Serializable {
     /**
      * @param course
      */
-    public void addCourse(Course course) {
-        this.courseArrayList.add(course);
-    }
+    //public void addCourse(Course course) {
+    //    this.courseArrayList.add(course);
+    //}
 
     /**
      * @param course
      */
-    public void removeCourse(Course course) {
-        this.courseArrayList.remove(course);
-    }
+    //public void removeCourse(Course course) {
+    //    this.courseArrayList.remove(course);
+    //}
 
     /**
      *
      */
-    public void clearCourses() {
-        this.courseArrayList.clear();
-    }
+    //public void clearCourses() {
+    //    this.courseArrayList.clear();
+    //}
 
 }

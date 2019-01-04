@@ -6,6 +6,7 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
+            android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -16,6 +17,7 @@
         <activity
             android:name=".TermListActivity"
             android:label="@string/title_activity_terms"
+            android:launchMode="singleTop"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
@@ -34,6 +36,7 @@
         <activity
             android:name=".TermDetailActivity"
             android:label="@string/title_activity_term_details"
+            android:launchMode="singleTop"
             android:parentActivityName=".TermListActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
@@ -43,9 +46,9 @@
         <activity
             android:name=".CourseDetailActivity"
             android:label="@string/title_activity_course_detail"
+            android:launchMode="singleTop"
             android:parentActivityName=".TermDetailActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            >
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.samuelraynor.app.c196_samuelraynor.feature.TermDetailActivity" />
@@ -53,12 +56,16 @@
         <activity
             android:name=".CourseEditActivity"
             android:label="@string/title_activity_course_edit"
-            android:parentActivityName=".TermDetailActivity"
+            android:parentActivityName=".CourseDetailActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.samuelraynor.app.c196_samuelraynor.feature.TermDetailActivity" />
+                android:value="com.samuelraynor.app.c196_samuelraynor.feature.CourseDetailActivity" />
         </activity>
+
+        <service
+            android:name=".DateNotificationService"
+            android:exported="false"></service>
     </application>
 
 </manifest>

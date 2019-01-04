@@ -9,6 +9,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,12 +28,16 @@ import com.samuelraynor.app.c196_samuelraynor.feature.model.Term;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class TermDetailActivity extends AppCompatActivity {
 
-    private final static int REQUESTCODE_TERM=1;
-    private final static int REQUESTCODE_COURSE=2;
+    private final static int REQUESTCODE_TERM = 1;
+    private final static int REQUESTCODE_COURSE = 2;
+
+    private final String LOGTAG = "MYDEBUG";
 
     protected Term selectedTerm;
     protected long termId;
@@ -42,7 +47,14 @@ public class TermDetailActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(LOGTAG, "onCreate");
         super.onCreate(savedInstanceState);
+
+        // Get the selected term id
+        Intent callingIntent = getIntent();
+        termId = callingIntent.getLongExtra("TERM", 0);
+        if (termId == 0) throw new RuntimeException("No term passed in EXTRA!");
+
         setContentView(R.layout.activity_term_detail);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -59,11 +71,6 @@ public class TermDetailActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-        // Get the selected term id
-        Intent callingIntent = getIntent();
-        termId = callingIntent.getLongExtra("TERM", 0);
-        if (termId == 0) throw new RuntimeException("No term passed in EXTRA!");
-
         // Get the term info from the database
         StudentData studentData = new StudentData(this);
         selectedTerm = studentData.getTerm(termId);
@@ -72,7 +79,6 @@ public class TermDetailActivity extends AppCompatActivity {
         showTitle(selectedTerm.getTitle());
         showStartDate(selectedTerm.getStart());
         showEndDate(selectedTerm.getEnd());
-
 
 
         // Set the ListView content
@@ -86,6 +92,7 @@ public class TermDetailActivity extends AppCompatActivity {
         courseList.setOnItemClickListener(getOnItemClickListener());
 
     }
+
 
     public void updateCourseInfoList() {
         // get the courseinfo from the database
@@ -111,7 +118,7 @@ public class TermDetailActivity extends AppCompatActivity {
                 Course selectedCourse = (Course) courseList.getItemAtPosition(position);
                 Intent courseDetailIntent = new Intent(parent.getContext(), CourseDetailActivity.class);
                 courseDetailIntent.putExtra("COURSE", selectedCourse);
-                startActivityForResult(courseDetailIntent, REQUESTCODE_TERM);
+                startActivityForResult(courseDetailIntent, REQUESTCODE_COURSE);
             }
         };
     }
@@ -140,7 +147,7 @@ public class TermDetailActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if(requestCode == REQUESTCODE_TERM) {
+        if (requestCode == REQUESTCODE_TERM) {
             if (resultCode == RESULT_OK) {
                 // user clicked save
                 Term savedTerm = (Term) data.getSerializableExtra("TERM");
@@ -215,5 +222,42 @@ public class TermDetailActivity extends AppCompatActivity {
         } else {
             return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    protected void onRestart() {
+        Log.d(LOGTAG, "onRestart");
+        super.onRestart();
+    }
+
+    @Override
+    protected void onResume() {
+        Log.d(LOGTAG, "onResume");
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        Log.d(LOGTAG, "onPause");
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        Log.d(LOGTAG, "onStop");
+        super.onStop();
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        this.termId = savedInstanceState.getLong("termId");
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putLong("termId", selectedTerm.getId());
+
+        // call superclass to save any view hierarchy
+        super.onSaveInstanceState(outState);
     }
 }

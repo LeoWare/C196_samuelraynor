@@ -10,8 +10,6 @@ package com.samuelraynor.app.c196_samuelraynor.feature.model;
 
 import android.support.annotation.StringDef;
 
-import com.samuelraynor.app.c196_samuelraynor.feature.Assessment;
-
 import java.io.Serializable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

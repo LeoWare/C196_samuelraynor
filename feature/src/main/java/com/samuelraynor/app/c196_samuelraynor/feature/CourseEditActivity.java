@@ -39,6 +39,7 @@ import java.util.Locale;
 
 public class CourseEditActivity extends AppCompatActivity {
 
+    private String LOGTAG = "MYDEBUG";
     private StudentData studentData;
     private String action;
     private long courseId;
@@ -49,9 +50,13 @@ public class CourseEditActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_course_edit);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        toolbar.setTitle(R.string.title_course_edit_activity);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
         // get a database
         this.studentData = new StudentData(this);
@@ -227,6 +232,8 @@ public class CourseEditActivity extends AppCompatActivity {
             studentData.deleteCourse(selectedCourse.getId());
         } catch (Exception e) {
             e.printStackTrace();
+
+            this.handleCancel();
         }
         setResult(RESULT_FIRST_USER);
         finish();
@@ -264,6 +271,7 @@ public class CourseEditActivity extends AppCompatActivity {
                 selectedCourse.setStart(formatter.parse((String) tvStartDate.getText()));
                 TextView tvEndDate = findViewById(R.id.tvEndDate);
                 selectedCourse.setEnd(formatter.parse((String) tvEndDate.getText()));
+                selectedCourse.setStatus(((Spinner) findViewById(R.id.sStatus)).getSelectedItem().toString());
             } catch (ParseException e) {
                 e.printStackTrace();
             } catch (Exception e) {

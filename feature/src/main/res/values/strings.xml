@@ -27,4 +27,5 @@
     <string name="mentor">Mentor: </string>
     <string name="phoneLabel">Phone:</string>
     <string name="emailLabel">Email:</string>
+    <string name="title_course_edit_activity">Edit Course Info</string>
 </resources>

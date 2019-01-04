@@ -114,100 +114,27 @@
         app:layout_constraintTop_toBottomOf="@+id/btnEndDate" />
 
     <TextView
-        android:id="@+id/tvMentorLabel"
-        style="@style/TextAppearance.AppCompat.Large"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/mentor"
-        app:layout_constraintTop_toBottomOf="@+id/tvStatusLabel" />
-
-    <TextView
-        android:id="@+id/tvMentorNameLabel"
-        style="@style/TextAppearance.AppCompat.Medium"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Name:"
-        app:layout_constraintTop_toBottomOf="@+id/tvMentorLabel" />
-
-    <TextView
         android:id="@+id/tvMentorName"
         style="@style/TextAppearance.AppCompat.Medium"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBaseline_toBaselineOf="@+id/tvMentorNameLabel"
-        app:layout_constraintLeft_toRightOf="@+id/tvMentorNameLabel"
-        app:layout_constraintStart_toEndOf="@+id/tvMentorNameLabel" />
-
-    <Button
-        android:id="@+id/btnMentorAdd"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="@dimen/general_margin"
-        android:text="Add Mentor"
-        app:layout_constraintBaseline_toBaselineOf="@+id/tvMentorLabel"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
-
-    <TextView
-        android:id="@+id/tvMentorPhoneLabel"
-        style="@style/TextAppearance.AppCompat.Medium"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Phone:"
-        app:layout_constraintTop_toBottomOf="@+id/tvMentorNameLabel" />
+        tools:layout_editor_absoluteX="52dp"
+        tools:layout_editor_absoluteY="201dp" />
 
     <TextView
         android:id="@+id/tvMentorPhone"
         style="@style/TextAppearance.AppCompat.Medium"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBaseline_toBaselineOf="@+id/tvMentorPhoneLabel"
-        app:layout_constraintLeft_toRightOf="@+id/tvMentorPhoneLabel"
-        app:layout_constraintStart_toEndOf="@+id/tvMentorPhoneLabel" />
-
-    <TextView
-        android:id="@+id/tvMentorEmailLabel"
-        style="@style/TextAppearance.AppCompat.Medium"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Email:"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvMentorPhoneLabel" />
+        tools:layout_editor_absoluteX="55dp"
+        tools:layout_editor_absoluteY="225dp" />
 
     <TextView
         android:id="@+id/tvMentorEmail"
         style="@style/TextAppearance.AppCompat.Medium"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBaseline_toBaselineOf="@+id/tvMentorEmailLabel"
-        app:layout_constraintLeft_toRightOf="@+id/tvMentorEmailLabel" />
-
-    <TextView
-        android:id="@+id/tvNoteslabel"
-        style="@style/TextAppearance.AppCompat.Medium"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Notes: "
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvMentorEmailLabel" />
-
-    <EditText
-        android:id="@+id/etNotes"
-        android:layout_width="0dp"
-        android:layout_height="120dp"
-        android:layout_marginLeft="@dimen/general_margin"
-        android:layout_marginRight="@dimen/general_margin"
-        android:background="@drawable/edittext_border"
-        android:ems="10"
-        android:gravity="top"
-        android:hint="Add notes here."
-        android:inputType="textMultiLine"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvNoteslabel" />
+        tools:layout_editor_absoluteX="48dp"
+        tools:layout_editor_absoluteY="249dp" />
 
 </android.support.constraint.ConstraintLayout>

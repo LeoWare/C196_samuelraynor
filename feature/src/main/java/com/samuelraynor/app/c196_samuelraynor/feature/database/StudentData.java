@@ -14,6 +14,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.samuelraynor.app.c196_samuelraynor.feature.model.Assessment;
 import com.samuelraynor.app.c196_samuelraynor.feature.model.Course;
 import com.samuelraynor.app.c196_samuelraynor.feature.model.Mentor;
 import com.samuelraynor.app.c196_samuelraynor.feature.model.Note;
@@ -266,11 +267,37 @@ public class StudentData extends SQLiteOpenHelper {
         String selection = TermsContract.TermsEntry._ID + " = ?";
         String[] selectionArgs = {String.valueOf(termId)};
 
+        // check to see if this term has courses
+        if (this.termHasCourses(termId)) {
+            throw new TermHasCoursesException("Term ID: " + String.valueOf(termId) + " has courses.");
+        }
         int returnValue = db.delete(TermsContract.TermsEntry.TABLE_NAME, selection, selectionArgs);
         return returnValue;
     }
 
+    public boolean termHasCourses(long termId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // query
+        Cursor mCount = db.rawQuery("SELECT COUNT(*) FROM " + CoursesContract.CoursesEntry.TABLE_NAME +
+                " WHERE " + CoursesContract.CoursesEntry.COLUMN_NAME_TERM_ID + "=" + String.valueOf(termId), null);
+        mCount.moveToFirst();
+        int count = mCount.getInt(0);
+        if (count != 0) {
+            // term has courses.
+            return true;
+        }
+        // term doesn't have courses.
+        return false;
+    }
+
     public class TermHasCoursesException extends Exception {
+        public TermHasCoursesException() {
+        }
+
+        public TermHasCoursesException(String message) {
+            super(message);
+        }
     }
 
     public ArrayList<Course> getAllCourses() {
@@ -392,7 +419,7 @@ public class StudentData extends SQLiteOpenHelper {
 
         ArrayList<Course> itemsList = new ArrayList<>();
         while (cursor.moveToNext()) {
-            Course newItem = null;
+            Course newItem = new Course();
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
 
             long itemId = cursor.getLong(
@@ -493,7 +520,6 @@ public class StudentData extends SQLiteOpenHelper {
     }
 
 
-
     public long addCourse(Course course) {
         // Gets the data repository in write mode
         SQLiteDatabase db = this.getWritableDatabase();
@@ -545,11 +571,16 @@ public class StudentData extends SQLiteOpenHelper {
         String[] selectionArgs = {String.valueOf(courseId)};
 
         int returnValue = db.delete(CoursesContract.CoursesEntry.TABLE_NAME, selection, selectionArgs);
+        // delete mentors, notes, and exams
+        this.deleteMentorsByCourseId(courseId);
+        this.deleteNotesByCourseId(courseId);
+        this.deleteAssessmentsByCourseId(courseId);
+
         return returnValue;
     }
 
 
-    private ArrayList<Mentor> getMentorsByCourseId(long courseId) {
+    public ArrayList<Mentor> getMentorsByCourseId(long courseId) {
         // Gets the data repository in read mode
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -593,7 +624,115 @@ public class StudentData extends SQLiteOpenHelper {
         return itemsList;
     }
 
-    private ArrayList<Note> getNotesByCourseId(long courseId) {
+    public long addMentor(Mentor newItem) {
+        // Gets the data repository in write mode
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Create a new map of values, where column names are the keys
+        ContentValues values = new ContentValues();
+        values.put(MentorsContract.MentorsEntry.COLUMN_NAME_COURSE_ID, newItem.getCourseId());
+        values.put(MentorsContract.MentorsEntry.COLUMN_NAME_NAME, newItem.getName());
+        values.put(MentorsContract.MentorsEntry.COLUMN_NAME_EMAIL, newItem.getEmail());
+        values.put(MentorsContract.MentorsEntry.COLUMN_NAME_PHONE, newItem.getPhone());
+
+        // Insert the new row, returning the primary key value of the new row
+        long returnValue = db.insert(MentorsContract.MentorsEntry.TABLE_NAME, null, values);
+        return returnValue;
+    }
+
+    public Mentor getMentor(long mentorId) {
+        // Gets the data repository in read mode
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // columns from 'courses'
+        String[] columns = {
+                MentorsContract.MentorsEntry._ID,
+                MentorsContract.MentorsEntry.COLUMN_NAME_COURSE_ID,
+                MentorsContract.MentorsEntry.COLUMN_NAME_NAME,
+                MentorsContract.MentorsEntry.COLUMN_NAME_EMAIL,
+                MentorsContract.MentorsEntry.COLUMN_NAME_PHONE,
+        };
+
+        // Filter results WHERE "_id" = 1
+        String selection = MentorsContract.MentorsEntry._ID + " = ?";
+        String[] selectionArgs = {String.valueOf(mentorId)};
+
+
+        Cursor cursor = db.query(
+                MentorsContract.MentorsEntry.TABLE_NAME,   // The table to query
+                columns,             // The array of columns to return (pass null to get all)
+                selection,              // The columns for the WHERE clause
+                selectionArgs,          // The values for the WHERE clause
+                null,                   // don't group the rows
+                null,                   // don't filter by row groups
+                null               // The sort order
+        );
+
+        ArrayList<Mentor> itemsList = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            Mentor newItem = new Mentor();
+
+            long itemId = cursor.getLong(cursor.getColumnIndexOrThrow(MentorsContract.MentorsEntry._ID));
+            long itemCourseId = cursor.getLong(cursor.getColumnIndexOrThrow(MentorsContract.MentorsEntry.COLUMN_NAME_COURSE_ID));
+            String itemName = cursor.getString(cursor.getColumnIndexOrThrow(MentorsContract.MentorsEntry.COLUMN_NAME_NAME));
+            String itemEmail = cursor.getString(cursor.getColumnIndexOrThrow(MentorsContract.MentorsEntry.COLUMN_NAME_EMAIL));
+            String itemPhone = cursor.getString(cursor.getColumnIndexOrThrow(MentorsContract.MentorsEntry.COLUMN_NAME_PHONE));
+
+            newItem.setId(itemId);
+            newItem.setCourseId(itemCourseId);
+            newItem.setName(itemName);
+            newItem.setEmail(itemEmail);
+            newItem.setPhone(itemPhone);
+
+            itemsList.add(newItem);
+        }
+        cursor.close();
+        return itemsList.get(0);
+    }
+
+    public long updateMentor(Mentor mentor) {
+        // Gets the data repository in write mode
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Create a new map of values, where column names are the keys
+        ContentValues values = new ContentValues();
+        values.put(MentorsContract.MentorsEntry.COLUMN_NAME_NAME, mentor.getName());
+        values.put(MentorsContract.MentorsEntry.COLUMN_NAME_EMAIL, mentor.getEmail());
+        values.put(MentorsContract.MentorsEntry.COLUMN_NAME_PHONE, mentor.getPhone());
+
+        // Which row to update, based on the title
+        String selection = MentorsContract.MentorsEntry._ID + " = ?";
+        String[] selectionArgs = {String.valueOf(mentor.getId())};
+
+        int returnValue = db.update(MentorsContract.MentorsEntry.TABLE_NAME, values, selection, selectionArgs);
+        return returnValue;
+    }
+
+    public int deleteMentor(long mentorId) {
+        // Gets the data repository in write mode
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Which row to update, based on the title
+        String selection = MentorsContract.MentorsEntry._ID + " = ?";
+        String[] selectionArgs = {String.valueOf(mentorId)};
+
+        int returnValue = db.delete(MentorsContract.MentorsEntry.TABLE_NAME, selection, selectionArgs);
+        return returnValue;
+    }
+
+    public int deleteMentorsByCourseId(long courseId) {
+        // Gets the data repository in write mode
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Which row to update, based on the title
+        String selection = MentorsContract.MentorsEntry.COLUMN_NAME_COURSE_ID + " = ?";
+        String[] selectionArgs = {String.valueOf(courseId)};
+
+        int returnValue = db.delete(MentorsContract.MentorsEntry.TABLE_NAME, selection, selectionArgs);
+        return returnValue;
+    }
+
+    public ArrayList<Note> getNotesByCourseId(long courseId) {
         // Gets the data repository in read mode
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -632,6 +771,275 @@ public class StudentData extends SQLiteOpenHelper {
         }
         cursor.close();
         return itemsList;
+    }
+
+    public long addNote(Note newItem) {
+        // Gets the data repository in write mode
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Create a new map of values, where column names are the keys
+        ContentValues values = new ContentValues();
+        values.put(NotesContract.NotesEntry.COLUMN_NAME_COURSE_ID, newItem.getCourseId());
+        values.put(NotesContract.NotesEntry.COLUMN_NAME_NOTE, newItem.getNote());
+
+        // Insert the new row, returning the primary key value of the new row
+        long returnValue = db.insert(NotesContract.NotesEntry.TABLE_NAME, null, values);
+        return returnValue;
+    }
+
+    public Note getNote(long noteId) {
+        // Gets the data repository in read mode
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // columns from 'courses'
+        String[] columns = {
+                NotesContract.NotesEntry._ID,
+                NotesContract.NotesEntry.COLUMN_NAME_COURSE_ID,
+                NotesContract.NotesEntry.COLUMN_NAME_NOTE,
+        };
+
+        // Filter results WHERE "_id" = 1
+        String selection = NotesContract.NotesEntry._ID + " = ?";
+        String[] selectionArgs = {String.valueOf(noteId)};
+
+
+        Cursor cursor = db.query(
+                NotesContract.NotesEntry.TABLE_NAME,   // The table to query
+                columns,             // The array of columns to return (pass null to get all)
+                selection,              // The columns for the WHERE clause
+                selectionArgs,          // The values for the WHERE clause
+                null,                   // don't group the rows
+                null,                   // don't filter by row groups
+                null               // The sort order
+        );
+
+        ArrayList<Note> itemsList = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            Note newItem = new Note();
+
+            long itemId = cursor.getLong(cursor.getColumnIndexOrThrow(NotesContract.NotesEntry._ID));
+            long itemCourseId = cursor.getLong(cursor.getColumnIndexOrThrow(NotesContract.NotesEntry.COLUMN_NAME_COURSE_ID));
+            String itemNote = cursor.getString(cursor.getColumnIndexOrThrow(NotesContract.NotesEntry.COLUMN_NAME_NOTE));
+
+            newItem.setId(itemId);
+            newItem.setCourseId(itemCourseId);
+            newItem.setNote(itemNote);
+
+            itemsList.add(newItem);
+        }
+        cursor.close();
+        return itemsList.get(0);
+    }
+
+    public long updateNote(Note note) {
+        // Gets the data repository in write mode
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Create a new map of values, where column names are the keys
+        ContentValues values = new ContentValues();
+        values.put(NotesContract.NotesEntry.COLUMN_NAME_NOTE, note.getNote());
+
+        // Which row to update, based on the title
+        String selection = NotesContract.NotesEntry._ID + " = ?";
+        String[] selectionArgs = {String.valueOf(note.getId())};
+
+        int returnValue = db.update(NotesContract.NotesEntry.TABLE_NAME, values, selection, selectionArgs);
+        return returnValue;
+    }
+
+    public int deleteNote(long noteId) {
+        // Gets the data repository in write mode
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Which row to update, based on the title
+        String selection = NotesContract.NotesEntry._ID + " = ?";
+        String[] selectionArgs = {String.valueOf(noteId)};
+
+        int returnValue = db.delete(NotesContract.NotesEntry.TABLE_NAME, selection, selectionArgs);
+        return returnValue;
+    }
+
+    public int deleteNotesByCourseId(long courseId) {
+        // Gets the data repository in write mode
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Which row to update, based on the title
+        String selection = NotesContract.NotesEntry.COLUMN_NAME_COURSE_ID + " = ?";
+        String[] selectionArgs = {String.valueOf(courseId)};
+
+        int returnValue = db.delete(NotesContract.NotesEntry.TABLE_NAME, selection, selectionArgs);
+        return returnValue;
+    }
+
+    public ArrayList<Assessment> getAssessmentsByCourseId(long courseId) {
+        // Gets the data repository in read mode
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // columns from 'assessments'
+        String[] columns = {
+                AssessmentsContract.AssessmentsEntry._ID,
+                AssessmentsContract.AssessmentsEntry.COLUMN_NAME_COURSE_ID,
+                AssessmentsContract.AssessmentsEntry.COLUMN_NAME_TITLE,
+                AssessmentsContract.AssessmentsEntry.COLUMN_NAME_TYPE,
+                AssessmentsContract.AssessmentsEntry.COLUMN_NAME_DUE,
+        };
+
+        // Filter results WHERE "_id" = 1
+        String selection = AssessmentsContract.AssessmentsEntry.COLUMN_NAME_COURSE_ID + " = ?";
+        String[] selectionArgs = {String.valueOf(courseId)};
+
+
+        Cursor cursor = db.query(
+                AssessmentsContract.AssessmentsEntry.TABLE_NAME,   // The table to query
+                columns,             // The array of columns to return (pass null to get all)
+                selection,              // The columns for the WHERE clause
+                selectionArgs,          // The values for the WHERE clause
+                null,                   // don't group the rows
+                null,                   // don't filter by row groups
+                null               // The sort order
+        );
+
+        ArrayList<Assessment> itemsList = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            Assessment newItem = new Assessment();
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
+
+            newItem.setId(cursor.getLong(cursor.getColumnIndexOrThrow(AssessmentsContract.AssessmentsEntry._ID)));
+            newItem.setCourseId(cursor.getLong(cursor.getColumnIndexOrThrow(AssessmentsContract.AssessmentsEntry.COLUMN_NAME_COURSE_ID)));
+            newItem.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(AssessmentsContract.AssessmentsEntry.COLUMN_NAME_TITLE)));
+
+            newItem.setType(cursor.getString(cursor.getColumnIndexOrThrow(AssessmentsContract.AssessmentsEntry.COLUMN_NAME_TYPE)));
+            try {
+                newItem.setDueDate(formatter.parse(cursor.getString(cursor.getColumnIndexOrThrow(AssessmentsContract.AssessmentsEntry.COLUMN_NAME_DUE))));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+
+            itemsList.add(newItem);
+        }
+        cursor.close();
+        return itemsList;
+    }
+
+    public long addAssessment(Assessment newItem) {
+        // Gets the data repository in write mode
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
+
+        // Create a new map of values, where column names are the keys
+        ContentValues values = new ContentValues();
+        values.put(AssessmentsContract.AssessmentsEntry.COLUMN_NAME_COURSE_ID, newItem.getCourseId());
+        values.put(AssessmentsContract.AssessmentsEntry.COLUMN_NAME_TITLE, newItem.getTitle());
+        values.put(AssessmentsContract.AssessmentsEntry.COLUMN_NAME_TYPE, newItem.getType());
+        values.put(AssessmentsContract.AssessmentsEntry.COLUMN_NAME_DUE, formatter.format(newItem.getDueDate()));
+
+        // Insert the new row, returning the primary key value of the new row
+        long returnValue = db.insert(AssessmentsContract.AssessmentsEntry.TABLE_NAME, null, values);
+        return returnValue;
+    }
+
+    public Assessment getAssessment(long assessmentId) {
+        // Gets the data repository in read mode
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
+
+        // columns from 'assessments'
+        String[] columns = {
+                AssessmentsContract.AssessmentsEntry._ID,
+                AssessmentsContract.AssessmentsEntry.COLUMN_NAME_COURSE_ID,
+                AssessmentsContract.AssessmentsEntry.COLUMN_NAME_TITLE,
+                AssessmentsContract.AssessmentsEntry.COLUMN_NAME_TYPE,
+                AssessmentsContract.AssessmentsEntry.COLUMN_NAME_DUE,
+        };
+
+        // Filter results WHERE "_id" = 1
+        String selection = AssessmentsContract.AssessmentsEntry._ID + " = ?";
+        String[] selectionArgs = {String.valueOf(assessmentId)};
+
+
+        Cursor cursor = db.query(
+                AssessmentsContract.AssessmentsEntry.TABLE_NAME,   // The table to query
+                columns,             // The array of columns to return (pass null to get all)
+                selection,              // The columns for the WHERE clause
+                selectionArgs,          // The values for the WHERE clause
+                null,                   // don't group the rows
+                null,                   // don't filter by row groups
+                null               // The sort order
+        );
+
+        ArrayList<Assessment> itemsList = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            Assessment newItem = new Assessment();
+
+            long itemId = cursor.getLong(cursor.getColumnIndexOrThrow(AssessmentsContract.AssessmentsEntry._ID));
+            long itemCourseId = cursor.getLong(cursor.getColumnIndexOrThrow(AssessmentsContract.AssessmentsEntry.COLUMN_NAME_COURSE_ID));
+            String itemTitle = cursor.getString(cursor.getColumnIndexOrThrow(AssessmentsContract.AssessmentsEntry.COLUMN_NAME_TITLE));
+            String itemType = cursor.getString(cursor.getColumnIndexOrThrow(AssessmentsContract.AssessmentsEntry.COLUMN_NAME_TYPE));
+            Date itemDue = new Date();
+            try {
+                itemDue = formatter.parse(cursor.getString(cursor.getColumnIndexOrThrow(AssessmentsContract.AssessmentsEntry.COLUMN_NAME_TYPE)));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            newItem.setId(itemId);
+            newItem.setCourseId(itemCourseId);
+            newItem.setTitle(itemTitle);
+            newItem.setType(itemType);
+            newItem.setDueDate(itemDue);
+
+            itemsList.add(newItem);
+        }
+        cursor.close();
+        return itemsList.get(0);
+    }
+
+    public long updateAssessment(Assessment assessment) {
+        // Gets the data repository in write mode
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
+
+        // Create a new map of values, where column names are the keys
+        ContentValues values = new ContentValues();
+        values.put(AssessmentsContract.AssessmentsEntry._ID, assessment.getId());
+        values.put(AssessmentsContract.AssessmentsEntry.COLUMN_NAME_TITLE, assessment.getTitle());
+        values.put(AssessmentsContract.AssessmentsEntry.COLUMN_NAME_TYPE, assessment.getType());
+        values.put(AssessmentsContract.AssessmentsEntry.COLUMN_NAME_DUE, formatter.format(assessment.getDueDate()));
+
+        // Which row to update, based on the title
+        String selection = AssessmentsContract.AssessmentsEntry._ID + " = ?";
+        String[] selectionArgs = {String.valueOf(assessment.getId())};
+
+        int returnValue = db.update(AssessmentsContract.AssessmentsEntry.TABLE_NAME, values, selection, selectionArgs);
+        return returnValue;
+    }
+
+    public int deleteAssessment(long assessmentId) {
+        // Gets the data repository in write mode
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Which row to update, based on the title
+        String selection = AssessmentsContract.AssessmentsEntry._ID + " = ?";
+        String[] selectionArgs = {String.valueOf(assessmentId)};
+
+        int returnValue = db.delete(AssessmentsContract.AssessmentsEntry.TABLE_NAME, selection, selectionArgs);
+        return returnValue;
+    }
+
+    public int deleteAssessmentsByCourseId(long courseId) {
+        // Gets the data repository in write mode
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Which row to update, based on the title
+        String selection = AssessmentsContract.AssessmentsEntry.COLUMN_NAME_COURSE_ID + " = ?";
+        String[] selectionArgs = {String.valueOf(courseId)};
+
+        int returnValue = db.delete(AssessmentsContract.AssessmentsEntry.TABLE_NAME, selection, selectionArgs);
+        return returnValue;
     }
 
 }

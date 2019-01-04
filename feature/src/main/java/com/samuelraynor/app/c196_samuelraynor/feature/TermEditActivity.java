@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.samuelraynor.app.c196_samuelraynor.feature.database.StudentData;
 import com.samuelraynor.app.c196_samuelraynor.feature.model.Term;
@@ -194,6 +195,12 @@ public class TermEditActivity extends AppCompatActivity {
             studentData.deleteTerm(selectedTerm.getId());
         } catch (StudentData.TermHasCoursesException e) {
             e.printStackTrace();
+
+            // make Toast
+            Toast.makeText(getApplicationContext(), e.getMessage(),
+                    Toast.LENGTH_SHORT).show();
+
+            this.handleCancel();
         }
         setResult(RESULT_FIRST_USER);
         finish();

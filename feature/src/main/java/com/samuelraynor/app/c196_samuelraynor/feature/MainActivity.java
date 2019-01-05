@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import com.samuelraynor.app.c196_samuelraynor.feature.service.DateNotificationService;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -20,6 +22,11 @@ public class MainActivity extends AppCompatActivity {
     public void showTermsActivity(View v) {
         Intent myIntent = new Intent(this, TermListActivity.class);
         startActivity(myIntent);
+    }
+
+    public void startService(View v) {
+        // start the DateNotificationService
+        startService(new Intent(this, DateNotificationService.class));
     }
 
 }

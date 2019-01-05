@@ -26,6 +26,7 @@ import com.samuelraynor.app.c196_samuelraynor.feature.model.Term;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 
 
 public class TermDetailActivity extends AppCompatActivity {

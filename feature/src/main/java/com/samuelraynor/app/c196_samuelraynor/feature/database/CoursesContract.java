@@ -25,6 +25,8 @@ public final class CoursesContract {
         public static final String COLUMN_NAME_START = "start_date";
         public static final String COLUMN_NAME_END = "end_date";
         public static final String COLUMN_NAME_STATUS = "status";
+        public static final String COLUMN_NAME_ALARM_START = "alarm_start";
+        public static final String COLUMN_NAME_ALARM_END = "alarm_end";
 
     }
 }

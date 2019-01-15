@@ -25,6 +25,7 @@ public class Assessment implements Serializable {
     @Type
     private String type;
     private Date dueDate;
+    private int alarmDue;
 
     public Assessment() {
         this.id = 0;
@@ -32,6 +33,15 @@ public class Assessment implements Serializable {
         this.title = "New Assessment";
         this.type = OBJECTIVE;
         this.dueDate = new Date();
+    }
+
+    public int getAlarmDue() {
+        return this.alarmDue;
+    }
+
+    public void setAlarmDue(int alarmDue) {
+        if ((alarmDue == 1) || (alarmDue == 0))
+            this.alarmDue = alarmDue;
     }
 
     @StringDef({OBJECTIVE, PERFORMANCE})

@@ -10,17 +10,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_marginBottom="@dimen/general_margin"
+    android:padding="@dimen/general_margin">
 
     <TextView
         android:id="@+id/tvNote"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:padding="@dimen/general_margin"
-        app:layout_constraintEnd_toStartOf="@+id/btnEdit"
-        app:layout_constraintRight_toLeftOf="@+id/btnEdit"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/btnShare"
+        app:layout_constraintRight_toRightOf="@+id/btnShare"
         tools:text="Note" />
 
     <ImageButton
@@ -38,12 +40,21 @@
         android:id="@+id/btnEdit"
         android:layout_width="48dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
         android:background="@android:color/transparent"
         android:src="@android:drawable/ic_menu_edit"
-        app:layout_constraintBottom_toBottomOf="@+id/tvNote"
+        app:layout_constraintBottom_toBottomOf="@+id/btnShare"
         app:layout_constraintEnd_toStartOf="@+id/btnDelete"
         app:layout_constraintRight_toLeftOf="@+id/btnDelete"
+        app:layout_constraintTop_toTopOf="@+id/btnShare" />
+
+    <ImageButton
+        android:id="@+id/btnShare"
+        android:layout_width="48dp"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:src="@android:drawable/ic_menu_share"
+        app:layout_constraintBottom_toBottomOf="@+id/tvNote"
+        app:layout_constraintEnd_toStartOf="@+id/btnEdit"
+        app:layout_constraintRight_toLeftOf="@+id/btnEdit"
         app:layout_constraintTop_toTopOf="@+id/tvNote" />
 </android.support.constraint.ConstraintLayout>

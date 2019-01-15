@@ -20,6 +20,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -65,6 +66,7 @@ public class CourseDetailActivity extends AppCompatActivity {
         // student data
         this.studentData = new StudentData(this);
 
+
         // Set the ListView content
         mentorsList = findViewById(R.id.mentorsListView);
         notesList = findViewById(R.id.notesListView);
@@ -86,7 +88,30 @@ public class CourseDetailActivity extends AppCompatActivity {
             }
         });*/
 
+
         selectedCourse = (Course) getIntent().getSerializableExtra("COURSE");
+
+        // set alarm button onClick
+        ImageButton startAlarm = findViewById(R.id.btnAlarmStart);
+        ImageButton endAlarm = findViewById(R.id.btnAlarmEnd);
+
+        startAlarm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                studentData.alarmToggle(selectedCourse, StudentData.ALARM_COURSE_START);
+                selectedCourse.setAlarmStart(selectedCourse.getAlarmStart() == 0 ? 1 : 0);
+                showStartDate(selectedCourse.getStart());
+            }
+        });
+
+        endAlarm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                studentData.alarmToggle(selectedCourse, StudentData.ALARM_COURSE_END);
+                selectedCourse.setAlarmEnd(selectedCourse.getAlarmEnd() == 0 ? 1 : 0);
+                showEndDate(selectedCourse.getEnd());
+            }
+        });
 
         showTitle(selectedCourse.getName());
         showStartDate(selectedCourse.getStart());
@@ -139,12 +164,31 @@ public class CourseDetailActivity extends AppCompatActivity {
         TextView tv = findViewById(R.id.textStartDate);
         SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
         tv.setText(formatter.format(date));
+
+        ImageButton startAlarm = findViewById(R.id.btnAlarmStart);
+
+        // show alarm status
+        int alarmStart = selectedCourse.getAlarmStart();
+        if (alarmStart == 1) {
+            startAlarm.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
+        } else {
+            startAlarm.setImageResource(android.R.drawable.ic_popup_reminder);
+        }
     }
 
     private void showEndDate(Date date) {
         TextView tv = findViewById(R.id.textEndDate);
         SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
         tv.setText(formatter.format(date));
+
+        ImageButton endAlarm = findViewById(R.id.btnAlarmEnd);
+
+        // show alarm status
+        if (selectedCourse.getAlarmEnd() == 1) {
+            endAlarm.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
+        } else {
+            endAlarm.setImageResource(android.R.drawable.ic_popup_reminder);
+        }
     }
 
     private void showStatus(String status) {
@@ -154,21 +198,225 @@ public class CourseDetailActivity extends AppCompatActivity {
 
     protected void showMentors() {
         ListView lv = findViewById(R.id.mentorsListView);
+        LinearLayout ll = findViewById(R.id.mentorsListLayout);
+        ll.removeAllViews();
 
-        MentorsAdapter mentorsAdapter = new MentorsAdapter(this, studentData.getMentorsByCourseId(selectedCourse.getId()));
-        lv.setAdapter(mentorsAdapter);
+        ArrayList<Mentor> mentors = studentData.getMentorsByCourseId(selectedCourse.getId());
+        View convertView = null;
+        for (Mentor mentor : mentors) {
+            convertView = LayoutInflater.from(getBaseContext()).inflate(R.layout.item_mentor, ll, false);
+            TextView tvName = (TextView) convertView.findViewById(R.id.tvName);
+            TextView tvPhone = (TextView) convertView.findViewById(R.id.tvPhone);
+            TextView tvEmail = (TextView) convertView.findViewById(R.id.tvEmail);
+
+            tvName.setText(mentor.getName());
+            tvPhone.setText(getString(R.string.phoneLabel).concat(" ").concat(mentor.getPhone()));
+            tvEmail.setText(getString(R.string.emailLabel).concat(" ").concat(mentor.getEmail()));
+
+            ImageButton edit = convertView.findViewById(R.id.btnEdit);
+            ImageButton delete = convertView.findViewById(R.id.btnDelete);
+
+            edit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //Snackbar.make(v, "EDIT Mentor::id(" + String.valueOf(v.getTag()) + ")", Snackbar.LENGTH_SHORT).show();
+
+                    // get the mentor id from the parent view
+                    long mentorId = Long.valueOf((Long) v.getTag());
+                    StudentData sd = new StudentData(v.getContext());
+
+                    MentorDialog dialog = new MentorDialog((Activity) v.getContext(), studentData.getMentor(mentorId), COMMAND_EDIT);
+                    dialog.show();
+
+                    // refresh listview
+                    showMentors();
+                }
+            });
+
+            delete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //Snackbar.make(v, "DELETE Mentor::id(" + String.valueOf(v.getTag()) + ")", Snackbar.LENGTH_SHORT).show();
+
+                    // get the mentor id from the parent view
+                    long mentorId = Long.valueOf((Long) v.getTag());
+                    StudentData sd = new StudentData(v.getContext());
+
+                    sd.deleteMentor(mentorId);
+
+                    // refresh listview
+                    showMentors();
+                }
+            });
+
+            edit.setTag(new Long(mentor.getId()));
+            delete.setTag(new Long(mentor.getId()));
+
+            ll.addView(convertView);
+        }
     }
 
     private void showNotes() {
         ListView lv = findViewById(R.id.notesListView);
-        NotesAdapter notesAdapter = new NotesAdapter(this, studentData.getNotesByCourseId(selectedCourse.getId()));
-        lv.setAdapter(notesAdapter);
+        LinearLayout ll = findViewById(R.id.notesListLayout);
+        ll.removeAllViews();
+
+        ArrayList<Note> notes = studentData.getNotesByCourseId(selectedCourse.getId());
+        View convertView = null;
+        for (Note note : notes) {
+            convertView = LayoutInflater.from(getBaseContext()).inflate(R.layout.item_note, ll, false);
+            TextView tvNote = (TextView) convertView.findViewById(R.id.tvNote);
+            tvNote.setText(note.getNote());
+
+            ImageButton edit = convertView.findViewById(R.id.btnEdit);
+            ImageButton delete = convertView.findViewById(R.id.btnDelete);
+            ImageButton share = convertView.findViewById(R.id.btnShare);
+
+            edit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //Snackbar.make(v, "EDIT Mentor::id(" + String.valueOf(v.getTag()) + ")", Snackbar.LENGTH_SHORT).show();
+
+                    // get the note id from the parent view
+                    long noteId = Long.valueOf((Long) v.getTag());
+
+                    NoteDialog dialog = new NoteDialog((Activity) v.getContext(), studentData.getNote(noteId), COMMAND_EDIT);
+                    dialog.show();
+
+                    // refresh listview
+                    showNotes();
+                }
+            });
+
+            delete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //Snackbar.make(v, "DELETE Mentor::id(" + String.valueOf(v.getTag()) + ")", Snackbar.LENGTH_SHORT).show();
+
+                    // get the mentor id from the parent view
+                    long noteId = Long.valueOf((Long) v.getTag());
+                    StudentData sd = new StudentData(v.getContext());
+
+                    sd.deleteNote(noteId);
+
+                    // refresh listview
+                    showNotes();
+                }
+            });
+
+            share.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //Snackbar.make(v, "DELETE Mentor::id(" + String.valueOf(v.getTag()) + ")", Snackbar.LENGTH_SHORT).show();
+
+                    // show a share dialog
+                    Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+
+                    // Share plain text
+                    sharingIntent.setType("text/plain");
+
+                    // get the note body
+                    String shareBody = String.valueOf(v.getTag());
+
+                    // put the subject and body into the Intent
+                    sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "I'm sharing a note with you!");
+                    sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+
+                    // start a chooser
+                    startActivity(Intent.createChooser(sharingIntent, "Share via"));
+
+                    // refresh listview
+                    showNotes();
+                }
+            });
+
+            edit.setTag(note.getId());
+            delete.setTag(note.getId());
+            share.setTag(note.getNote());
+
+            ll.addView(convertView);
+        }
+
+        //NotesAdapter notesAdapter = new NotesAdapter(this, studentData.getNotesByCourseId(selectedCourse.getId()));
+        //lv.setAdapter(notesAdapter);
     }
 
     private void showExams() {
         ListView lv = findViewById(R.id.examsListView);
-        ExamsAdapter examsAdapter = new ExamsAdapter(this, studentData.getAssessmentsByCourseId(selectedCourse.getId()));
-        lv.setAdapter(examsAdapter);
+        LinearLayout ll = findViewById(R.id.examsListLayout);
+        ll.removeAllViews();
+
+        ArrayList<Assessment> assessments = studentData.getAssessmentsByCourseId(selectedCourse.getId());
+        View convertView = null;
+        for (Assessment assessment : assessments) {
+            convertView = LayoutInflater.from(getBaseContext()).inflate(R.layout.item_assessment, ll, false);
+            TextView tvTitle = (TextView) convertView.findViewById(R.id.textTitle);
+            TextView tvType = (TextView) convertView.findViewById(R.id.textType);
+            TextView tvDueDate = (TextView) convertView.findViewById(R.id.textDueDate);
+
+            SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
+            tvTitle.setText(assessment.getTitle());
+            tvType.setText("Type: ".concat(assessment.getType()));
+            tvDueDate.setText("Due Date: ".concat(formatter.format(assessment.getDueDate())));
+
+            ImageButton edit = convertView.findViewById(R.id.btnEdit);
+            ImageButton delete = convertView.findViewById(R.id.btnDelete);
+            ImageButton alarm = convertView.findViewById(R.id.btnAlarmDue);
+
+            if (assessment.getAlarmDue() == 1) {
+                alarm.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
+            } else {
+                alarm.setImageResource(android.R.drawable.ic_popup_reminder);
+            }
+
+            edit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //Snackbar.make(v, "EDIT Mentor::id(" + String.valueOf(v.getTag()) + ")", Snackbar.LENGTH_SHORT).show();
+
+                    // get the note id from the parent view
+                    long examId = Long.valueOf((Long) v.getTag());
+
+                    ExamDialog dialog = new ExamDialog((Activity) v.getContext(), studentData.getAssessment(examId), COMMAND_EDIT);
+                    dialog.show();
+
+                    // refresh listview
+                    showExams();
+                }
+            });
+
+            delete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //Snackbar.make(v, "DELETE Mentor::id(" + String.valueOf(v.getTag()) + ")", Snackbar.LENGTH_SHORT).show();
+
+                    // get the mentor id from the parent view
+                    long examId = Long.valueOf((Long) v.getTag());
+                    StudentData sd = new StudentData(v.getContext());
+
+                    sd.deleteAssessment(examId);
+
+                    // refresh listview
+                    showExams();
+                }
+            });
+
+            alarm.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    studentData.alarmToggle(studentData.getAssessment((Long) v.getTag()), StudentData.ALARM_ASSESSMENT_DUE);
+                    showExams();
+                }
+            });
+
+            edit.setTag(new Long(assessment.getId()));
+            delete.setTag(new Long(assessment.getId()));
+            alarm.setTag(new Long(assessment.getId()));
+
+            ll.addView(convertView);
+        }
+
+
     }
 
 
@@ -187,7 +435,7 @@ public class CourseDetailActivity extends AppCompatActivity {
      *
      * @param view
      */
-    protected void cmdAddMentor(View view) {
+    public void cmdAddMentor(View view) {
         Mentor mentor = new Mentor();
         mentor.setCourseId(selectedCourse.getId());
 
@@ -200,7 +448,7 @@ public class CourseDetailActivity extends AppCompatActivity {
      *
      * @param view
      */
-    protected void cmdAddNote(View view) {
+    public void cmdAddNote(View view) {
         Note note = new Note();
         note.setCourseId(selectedCourse.getId());
 
@@ -213,7 +461,7 @@ public class CourseDetailActivity extends AppCompatActivity {
      *
      * @param view
      */
-    protected void cmdAddExam(View view) {
+    public void cmdAddExam(View view) {
         Assessment assessment = new Assessment();
         assessment.setCourseId(selectedCourse.getId());
 
@@ -233,8 +481,16 @@ public class CourseDetailActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             this.selectedCourse = (Course) data.getSerializableExtra("COURSE");
             refresh();
+        } else if (resultCode == RESULT_CANCELED) {
+            // do nothing
+        } else if (resultCode == RESULT_FIRST_USER) {
+            // user deleted the record
+            // finish the activity
+            setResult(resultCode);
+            finish();
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
         }
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     protected class CourseAdapter extends ArrayAdapter<Course> {

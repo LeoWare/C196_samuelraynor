@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.samuelraynor.app.c196_samuelraynor.feature"
-    android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+    package="com.samuelraynor.app.c196_samuelraynor.feature">
 
     <application>
         <activity
@@ -64,16 +63,25 @@
                 android:value="com.samuelraynor.app.c196_samuelraynor.feature.CourseDetailActivity" />
         </activity>
 
-        <receiver android:name=".service.Autostart">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
-
         <service
             android:name=".service.DateNotificationService"
             android:enabled="true"
             android:exported="true"></service>
+
+        <service
+            android:name=".service.DateJobService"
+            android:label="Date Notification Service"
+            android:permission="android.permission.BIND_JOB_SERVICE"></service>
+
+        <receiver
+            android:name="com.samuelraynor.app.c196_samuelraynor.feature.service.Autostart"
+            android:enabled="true"
+            android:exported="true"
+            android:label="RestartServiceWhenStopped">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
     </application>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"></uses-permission>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 </manifest>

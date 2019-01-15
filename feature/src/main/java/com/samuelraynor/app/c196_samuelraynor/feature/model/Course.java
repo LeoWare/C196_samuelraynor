@@ -24,6 +24,25 @@ public class Course implements Serializable {
     private Date start;
     private Date end;
 
+    private int alarmStart;
+    private int alarmEnd;
+
+    public int getAlarmStart() {
+        return alarmStart;
+    }
+
+    public void setAlarmStart(int alarmStart) {
+        this.alarmStart = alarmStart;
+    }
+
+    public int getAlarmEnd() {
+        return alarmEnd;
+    }
+
+    public void setAlarmEnd(int alarmEnd) {
+        this.alarmEnd = alarmEnd;
+    }
+
     private ArrayList<Mentor> mentorArrayList;
 
     @Status
@@ -174,6 +193,7 @@ public class Course implements Serializable {
     public long getTermId() {
         return termId;
     }
+
 
     @StringDef({PLAN_TO_TAKE, IN_PROGRESS, COMPLETED, DROPPED})
     @Retention(RetentionPolicy.SOURCE)

@@ -23,19 +23,22 @@
         <TextView
             android:id="@+id/textTitleLabel"
             style="@style/TextAppearance.AppCompat.Large"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/general_margin"
             android:layout_marginLeft="@dimen/general_margin"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
             android:text="@string/title"
             android:textAllCaps="false"
+            app:layout_constraintEnd_toEndOf="@+id/textStartDateLabel"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/textTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/general_margin"
             android:layout_marginLeft="@dimen/general_margin"
@@ -45,65 +48,107 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintStart_toEndOf="@+id/textTitleLabel" />
 
+
         <TextView
             android:id="@+id/textStartDateLabel"
             style="@style/TextAppearance.AppCompat.Large"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/general_margin"
             android:layout_marginLeft="@dimen/general_margin"
+            android:layout_marginTop="8dp"
             android:text="Start Date:"
+            app:layout_constraintBottom_toTopOf="@+id/btnAlarmEnd"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textTitleLabel" />
+            app:layout_constraintTop_toTopOf="@+id/btnAlarmStart" />
 
         <TextView
             android:id="@+id/textStartDate"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintBaseline_toBaselineOf="@+id/textStartDateLabel"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnAlarmEnd"
             app:layout_constraintLeft_toRightOf="@+id/textStartDateLabel"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/btnAlarmEnd"
             app:layout_constraintStart_toEndOf="@+id/textStartDateLabel" />
+
+        <ImageButton
+            android:id="@+id/btnAlarmStart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:background="@android:color/darker_gray"
+            android:onClick="cmdAddExam"
+            android:padding="3dp"
+            android:src="@android:drawable/ic_popup_reminder"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textTitleLabel"
+            app:srcCompat="@android:drawable/ic_popup_reminder" />
 
         <TextView
             android:id="@+id/textEndDateLabel"
             style="@style/TextAppearance.AppCompat.Large"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/general_margin"
             android:layout_marginLeft="@dimen/general_margin"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
             android:text="End Date:"
+            app:layout_constraintBottom_toBottomOf="@+id/btnAlarmEnd"
+            app:layout_constraintEnd_toEndOf="@+id/textStartDateLabel"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textStartDateLabel" />
+            app:layout_constraintTop_toBottomOf="@+id/btnAlarmStart" />
 
         <TextView
             android:id="@+id/textEndDate"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintBaseline_toBaselineOf="@+id/textEndDateLabel"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintLeft_toRightOf="@+id/textEndDateLabel"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/btnAlarmEnd"
+            app:layout_constraintEnd_toStartOf="@+id/btnAlarmEnd"
             app:layout_constraintStart_toEndOf="@+id/textEndDateLabel" />
+
+        <ImageButton
+            android:id="@+id/btnAlarmEnd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:background="@android:color/darker_gray"
+            android:onClick="cmdAddExam"
+            android:padding="3dp"
+            android:src="@android:drawable/ic_popup_reminder"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnAlarmStart"
+            app:srcCompat="@android:drawable/ic_popup_reminder" />
+
 
         <TextView
             android:id="@+id/textStatusLabel"
             style="@style/TextAppearance.AppCompat.Large"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/general_margin"
             android:layout_marginLeft="@dimen/general_margin"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
             android:text="Status"
+            app:layout_constraintEnd_toStartOf="@+id/textStartDate"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textEndDateLabel" />
 
         <TextView
             android:id="@+id/textStatus"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintBaseline_toBaselineOf="@+id/textStatusLabel"
             app:layout_constraintEnd_toEndOf="parent"
@@ -142,11 +187,26 @@
             android:id="@+id/mentorsListView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:footerDividersEnabled="true"
+            android:headerDividersEnabled="true"
+            android:scrollbars="none"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/btnAddMentor"
             tools:layout_height="100dp" />
+
+        <LinearLayout
+            android:id="@+id/mentorsListLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/mentorsListView"
+            tools:layout_height="100dp"></LinearLayout>
 
         <TextView
             android:id="@+id/textNotesLabel"
@@ -158,7 +218,7 @@
             android:text="Notes"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/mentorsListView" />
+            app:layout_constraintTop_toBottomOf="@+id/mentorsListLayout" />
 
         <ImageButton
             android:id="@+id/btnAddNote"
@@ -178,11 +238,26 @@
             android:id="@+id/notesListView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:footerDividersEnabled="true"
+            android:headerDividersEnabled="true"
+            android:scrollbars="none"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/btnAddNote"
             tools:layout_height="100dp" />
+
+        <LinearLayout
+            android:id="@+id/notesListLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/notesListView"
+            tools:layout_height="100dp"></LinearLayout>
 
         <TextView
             android:id="@+id/textExamsLabel"
@@ -194,7 +269,7 @@
             android:text="Assessments"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/notesListView" />
+            app:layout_constraintTop_toBottomOf="@+id/notesListLayout" />
 
         <ImageButton
             android:id="@+id/btnAddExam"
@@ -214,11 +289,25 @@
             android:id="@+id/examsListView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:footerDividersEnabled="true"
+            android:headerDividersEnabled="true"
+            android:scrollbars="none"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/btnAddExam"
             tools:layout_height="100dp" />
 
+        <LinearLayout
+            android:id="@+id/examsListLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/examsListView"
+            tools:layout_height="100dp"></LinearLayout>
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

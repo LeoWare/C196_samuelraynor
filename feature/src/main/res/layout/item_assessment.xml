@@ -10,7 +10,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_marginBottom="@dimen/general_margin"
+    android:padding="@dimen/general_margin">
 
     <TextView
         android:id="@+id/textTitle"
@@ -44,15 +46,29 @@
         tools:text="01/01/2019" />
 
     <ImageButton
+        android:id="@+id/btnAlarmDue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:background="@android:color/darker_gray"
+        android:padding="3dp"
+        android:src="@android:drawable/ic_popup_reminder"
+        app:layout_constraintBottom_toBottomOf="@+id/btnEdit"
+        app:layout_constraintEnd_toStartOf="@+id/btnEdit"
+        app:layout_constraintRight_toLeftOf="@+id/btnEdit"
+        app:layout_constraintTop_toTopOf="@+id/btnEdit"
+        app:srcCompat="@android:drawable/ic_popup_reminder" />
+
+    <ImageButton
         android:id="@+id/btnDelete"
         android:layout_width="48dp"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:src="@android:drawable/ic_menu_delete"
+        app:layout_constraintTop_toTopOf="@+id/btnEdit"
         app:layout_constraintBottom_toBottomOf="@+id/btnEdit"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/btnEdit" />
+        app:layout_constraintRight_toRightOf="parent" />
 
     <ImageButton
         android:id="@+id/btnEdit"

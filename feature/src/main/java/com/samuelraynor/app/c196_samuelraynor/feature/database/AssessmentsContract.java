@@ -24,7 +24,7 @@ public class AssessmentsContract {
         public static final String COLUMN_NAME_TITLE = "title";
         public static final String COLUMN_NAME_TYPE = "type";
         public static final String COLUMN_NAME_DUE = "due_date";
-
+        public static final String COLUMN_NAME_ALARM_DUE = "alarm_due";
 
     }
 

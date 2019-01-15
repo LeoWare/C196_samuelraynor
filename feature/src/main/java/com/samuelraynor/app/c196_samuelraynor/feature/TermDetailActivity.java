@@ -166,6 +166,13 @@ public class TermDetailActivity extends AppCompatActivity {
         } else if (requestCode == REQUESTCODE_COURSE) {
             if (resultCode == RESULT_OK) {
                 updateCourseInfoList();
+            } else if (resultCode == RESULT_FIRST_USER) {
+                // user deleted the record
+                // finish the activity
+                setResult(resultCode);
+                finish();
+            } else {
+                super.onActivityResult(requestCode, resultCode, data);
             }
         }
     }

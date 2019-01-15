@@ -8,19 +8,15 @@
 
 package com.samuelraynor.app.c196_samuelraynor.feature.service;
 
-import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.Service;
-import android.content.Context;
-import android.content.Intent;
+import android.app.job.JobParameters;
+import android.app.job.JobService;
 import android.os.Build;
-import android.os.IBinder;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.samuelraynor.app.c196_samuelraynor.feature.R;
 import com.samuelraynor.app.c196_samuelraynor.feature.database.StudentData;
@@ -29,96 +25,45 @@ import com.samuelraynor.app.c196_samuelraynor.feature.model.Course;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Locale;
 
-
-/**
- * Check the database for exam due dates and course
- * end dates. Send a notification if there is an
- * exam due or course ending within 7 days from now.
- */
-public class DateNotificationService extends Service {
-
+@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+public class DateJobService extends JobService {
     private static final String TAG = "DateNotificationService";
 
-    private AlarmManager am;
-    private PendingIntent pi;
-    private Context context;
-
-    public DateNotificationService() {
-    }
-
-    public DateNotificationService(Context applicationContext) {
-        super();
-        this.context = applicationContext;
-    }
-
     @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
+    public boolean onStartJob(JobParameters params) {
+        Log.i(TAG, "DateJobService::onStartJob()");
 
-    @Override
-    public void onCreate() {
+        //Intent service = new Intent(getApplicationContext(), DateNotificationService.class);
+        //getApplicationContext().startService(service);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // create notification channel
-            createNotificationChannel(); // for API 26+
-        }
-
-        // on creation, schedule ourselves to run periodically
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Helper.scheduleJob(getApplicationContext());
-        } else {
-            // use the pre-API 21 way
-            Calendar cal = Calendar.getInstance();
-            this.am = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-            Intent serviceIntent = new Intent(this, DateNotificationService.class);
-            this.pi = PendingIntent.getService(getApplicationContext(), 0, serviceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-            this.am.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), (1000 * 30), this.pi);
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.i(TAG, "onDestroy called.");
-        Toast.makeText(this, "WGU Service Destroyed", Toast.LENGTH_LONG).show();
-
-        // we are being destroyed. reschedule or restart our service.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Log.i(TAG, "Rescheduling job service.");
-            Helper.scheduleJob(getApplicationContext());
-        } else {
-            Log.i(TAG, "Sending broadcastIntent.");
-            Intent broadcastIntent = new Intent(this, Autostart.class);
-            sendBroadcast(broadcastIntent);
-            this.am.cancel(this.pi);
-        }
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, final int startId) {
-        super.onStartCommand(intent, flags, startId);
-        Toast.makeText(this, "WGU Service Started", Toast.LENGTH_LONG).show();
-        Log.i(TAG, "onStartCommand called.");
+        // Create notification channel
+        createNotificationChannel();
 
         // Get the service task
         Runnable r = getServiceRunnable();
-
         // Start the thread and do our work.
         Thread serviceThread = new Thread(r);
         serviceThread.start();
 
-        return Service.START_STICKY;
-        //return super.onStartCommand(intent, flags, startId);
+        // reschedule ourselves
+        Helper.scheduleJob(getApplicationContext());
+        return true;
+    }
+
+    @Override
+    public boolean onStopJob(JobParameters params) {
+        Log.i(TAG, "DateJobService::onStopJob()");
+        return true;
     }
 
     private Runnable getServiceRunnable() {
         return new Runnable() {
             @Override
             public void run() {
+                //Toast.makeText(getApplicationContext(), "WGU JobService Started", Toast.LENGTH_LONG).show();
+                Log.i(TAG, "Running JobService Runnable");
                 StudentData studentData = new StudentData(getBaseContext());
                 SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
                 // Check the database for exam due dates and course
@@ -174,7 +119,9 @@ public class DateNotificationService extends Service {
                     // notificationId is a unique int for each notification that you must define
                     notificationManager.notify(1, mBuilder.build());*/
                 }
+
             }
+
         };
     }
 

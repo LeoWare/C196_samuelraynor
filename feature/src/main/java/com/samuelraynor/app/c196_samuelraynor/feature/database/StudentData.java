@@ -13,6 +13,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.samuelraynor.app.c196_samuelraynor.feature.model.Assessment;
 import com.samuelraynor.app.c196_samuelraynor.feature.model.Course;
@@ -23,12 +24,20 @@ import com.samuelraynor.app.c196_samuelraynor.feature.model.Term;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+
 public class StudentData extends SQLiteOpenHelper {
+    public static final String ALARM_COURSE_START = CoursesContract.CoursesEntry.COLUMN_NAME_ALARM_START;
+    public static final String ALARM_COURSE_END = CoursesContract.CoursesEntry.COLUMN_NAME_ALARM_END;
+    public static final String ALARM_ASSESSMENT_DUE = AssessmentsContract.AssessmentsEntry.COLUMN_NAME_ALARM_DUE;
+
+    private static final String TAG = ".feature.database";
+
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 4;
+    public static final int DATABASE_VERSION = 7;
     public static final String DATABASE_NAME = "StudentData.db";
 
     private static final String SQL_CREATE_TERMS =
@@ -48,7 +57,9 @@ public class StudentData extends SQLiteOpenHelper {
                     CoursesContract.CoursesEntry.COLUMN_NAME_TITLE + " TEXT," +
                     CoursesContract.CoursesEntry.COLUMN_NAME_START + " DATE," +
                     CoursesContract.CoursesEntry.COLUMN_NAME_END + " DATE," +
-                    CoursesContract.CoursesEntry.COLUMN_NAME_STATUS + " TEXT)";
+                    CoursesContract.CoursesEntry.COLUMN_NAME_STATUS + " TEXT," +
+                    CoursesContract.CoursesEntry.COLUMN_NAME_ALARM_START + " INTEGER," +
+                    CoursesContract.CoursesEntry.COLUMN_NAME_ALARM_END + " INTEGER)";
 
     private static final String SQL_DELETE_COURSES =
             "DROP TABLE IF EXISTS " + CoursesContract.CoursesEntry.TABLE_NAME;
@@ -56,7 +67,7 @@ public class StudentData extends SQLiteOpenHelper {
     private static final String SQL_CREATE_MENTORS =
             "CREATE TABLE " + MentorsContract.MentorsEntry.TABLE_NAME + " (" +
                     MentorsContract.MentorsEntry._ID + " INTEGER PRIMARY KEY," +
-                    NotesContract.NotesEntry.COLUMN_NAME_COURSE_ID + " INTEGER," +
+                    MentorsContract.MentorsEntry.COLUMN_NAME_COURSE_ID + " INTEGER," +
                     MentorsContract.MentorsEntry.COLUMN_NAME_NAME + " TEXT," +
                     MentorsContract.MentorsEntry.COLUMN_NAME_PHONE + " TEXT," +
                     MentorsContract.MentorsEntry.COLUMN_NAME_EMAIL + " TEXT)";
@@ -76,11 +87,11 @@ public class StudentData extends SQLiteOpenHelper {
     private static final String SQL_CREATE_ASSESSMENTS =
             "CREATE TABLE " + AssessmentsContract.AssessmentsEntry.TABLE_NAME + " (" +
                     AssessmentsContract.AssessmentsEntry._ID + " INTEGER PRIMARY KEY," +
-                    NotesContract.NotesEntry.COLUMN_NAME_COURSE_ID + " INTEGER," +
+                    AssessmentsContract.AssessmentsEntry.COLUMN_NAME_COURSE_ID + " INTEGER," +
                     AssessmentsContract.AssessmentsEntry.COLUMN_NAME_TITLE + " TEXT," +
                     AssessmentsContract.AssessmentsEntry.COLUMN_NAME_TYPE + " DATE," +
-                    AssessmentsContract.AssessmentsEntry.COLUMN_NAME_DUE + " DATE)";
-    ;
+                    AssessmentsContract.AssessmentsEntry.COLUMN_NAME_DUE + " DATE," +
+                    AssessmentsContract.AssessmentsEntry.COLUMN_NAME_ALARM_DUE + " INTEGER)";
 
     private static final String SQL_DELETE_ASSESSMENTS =
             "DROP TABLE IF EXISTS " + AssessmentsContract.AssessmentsEntry.TABLE_NAME;
@@ -90,6 +101,7 @@ public class StudentData extends SQLiteOpenHelper {
     }
 
     public void onCreate(SQLiteDatabase db) {
+        Log.i(TAG, "database: onCreate");
         db.execSQL(SQL_CREATE_TERMS);
         db.execSQL(SQL_CREATE_COURSES);
         db.execSQL(SQL_CREATE_MENTORS);
@@ -98,6 +110,7 @@ public class StudentData extends SQLiteOpenHelper {
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        Log.i(TAG, "database: onUpgrade");
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
         db.execSQL(SQL_DELETE_TERMS);
@@ -110,6 +123,7 @@ public class StudentData extends SQLiteOpenHelper {
     }
 
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        Log.i(TAG, "database: onDowngrade");
         onUpgrade(db, oldVersion, newVersion);
     }
 
@@ -139,7 +153,7 @@ public class StudentData extends SQLiteOpenHelper {
         ArrayList<Term> termsList = new ArrayList<>();
         while (cursor.moveToNext()) {
             Term newTerm = new Term();
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/DD", Locale.US);
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd", Locale.US);
 
             long itemId = cursor.getLong(
                     cursor.getColumnIndexOrThrow(TermsContract.TermsEntry._ID));
@@ -195,7 +209,7 @@ public class StudentData extends SQLiteOpenHelper {
         ArrayList<Term> termsList = new ArrayList<>();
         while (cursor.moveToNext()) {
             Term newTerm = new Term();
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/DD", Locale.US);
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd", Locale.US);
 
             long itemId = cursor.getLong(
                     cursor.getColumnIndexOrThrow(TermsContract.TermsEntry._ID));
@@ -225,7 +239,7 @@ public class StudentData extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // date formatter
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/DD", Locale.US);
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd", Locale.US);
 
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
@@ -243,7 +257,7 @@ public class StudentData extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // date formatter
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/DD", Locale.US);
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd", Locale.US);
 
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
@@ -291,6 +305,322 @@ public class StudentData extends SQLiteOpenHelper {
         return false;
     }
 
+    public ArrayList<Assessment> getExamsDue() {
+        // Gets the data repository in read mode
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // setup columns
+        String[] columns = {
+                AssessmentsContract.AssessmentsEntry._ID,
+                AssessmentsContract.AssessmentsEntry.COLUMN_NAME_COURSE_ID,
+                AssessmentsContract.AssessmentsEntry.COLUMN_NAME_TITLE,
+                AssessmentsContract.AssessmentsEntry.COLUMN_NAME_TYPE,
+                AssessmentsContract.AssessmentsEntry.COLUMN_NAME_DUE,
+                AssessmentsContract.AssessmentsEntry.COLUMN_NAME_ALARM_DUE,
+        };
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd", Locale.US);
+        Calendar cal = Calendar.getInstance();
+        Date today = cal.getTime();
+        cal.add(Calendar.DAY_OF_MONTH, 7);
+        Date nextWeek = cal.getTime();
+
+
+        // Filter results WHERE "due_date" >= "yyyy/MM/dd" AND "due_date" <= "yyyy/MM/dd+7"
+        String selection = AssessmentsContract.AssessmentsEntry.COLUMN_NAME_ALARM_DUE + " = 1";
+        //String[] selectionArgs = {formatter.format(today), formatter.format(nextWeek)};
+
+        Cursor cursor = db.query(
+                AssessmentsContract.AssessmentsEntry.TABLE_NAME,   // The table to query
+                columns,             // The array of columns to return (pass null to get all)
+                selection,              // The columns for the WHERE clause
+                null,          // The values for the WHERE clause
+                null,                   // don't group the rows
+                null,                   // don't filter by row groups
+                null               // The sort order
+        );
+
+        ArrayList<Assessment> examsList = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            Assessment newItem = new Assessment();
+
+            long itemId = cursor.getLong(
+                    cursor.getColumnIndexOrThrow(AssessmentsContract.AssessmentsEntry._ID));
+            long itemCourseId = cursor.getLong(
+                    cursor.getColumnIndexOrThrow(AssessmentsContract.AssessmentsEntry.COLUMN_NAME_COURSE_ID));
+            String itemTitle = cursor.getString(cursor.getColumnIndexOrThrow(AssessmentsContract.AssessmentsEntry.COLUMN_NAME_TITLE));
+            String itemType = cursor.getString(cursor.getColumnIndexOrThrow(AssessmentsContract.AssessmentsEntry.COLUMN_NAME_TYPE));
+            int itemAlarmDue = cursor.getInt(cursor.getColumnIndexOrThrow(AssessmentsContract.AssessmentsEntry.COLUMN_NAME_ALARM_DUE));
+
+            Date itemDueDate = null;
+            try {
+                itemDueDate = formatter.parse(cursor.getString(cursor.getColumnIndexOrThrow(AssessmentsContract.AssessmentsEntry.COLUMN_NAME_DUE)));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            newItem.setId(itemId);
+            newItem.setCourseId(itemCourseId);
+            newItem.setTitle(itemTitle);
+            newItem.setType(itemType);
+            newItem.setDueDate(itemDueDate);
+            newItem.setAlarmDue(itemAlarmDue);
+
+            examsList.add(newItem);
+        }
+        cursor.close();
+        return examsList;
+    }
+
+    public ArrayList<Course> getCoursesStarting() {
+        // Gets the data repository in read mode
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // setup columns
+        String[] columns = {
+                CoursesContract.CoursesEntry._ID,
+                CoursesContract.CoursesEntry.COLUMN_NAME_TERM_ID,
+                CoursesContract.CoursesEntry.COLUMN_NAME_TITLE,
+                CoursesContract.CoursesEntry.COLUMN_NAME_START,
+                CoursesContract.CoursesEntry.COLUMN_NAME_END,
+                CoursesContract.CoursesEntry.COLUMN_NAME_STATUS,
+                CoursesContract.CoursesEntry.COLUMN_NAME_ALARM_START,
+                CoursesContract.CoursesEntry.COLUMN_NAME_ALARM_END,
+        };
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd", Locale.US);
+        Calendar cal = Calendar.getInstance();
+        Date today = cal.getTime();
+        cal.add(Calendar.DAY_OF_MONTH, 7);
+        Date nextWeek = cal.getTime();
+
+
+        // Filter results WHERE "due_date" >= "yyyy/MM/dd" AND "due_date" <= "yyyy/MM/dd+7"
+        String selection = CoursesContract.CoursesEntry.COLUMN_NAME_ALARM_START + " = 1";
+        //String[] selectionArgs = {formatter.format(today), formatter.format(nextWeek)};
+
+        Cursor cursor = db.query(
+                CoursesContract.CoursesEntry.TABLE_NAME,   // The table to query
+                columns,             // The array of columns to return (pass null to get all)
+                selection,              // The columns for the WHERE clause
+                null,          // The values for the WHERE clause
+                null,                   // don't group the rows
+                null,                   // don't filter by row groups
+                null               // The sort order
+        );
+
+        ArrayList<Course> coursesList = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            Course newItem = new Course();
+
+            long itemId = cursor.getLong(
+                    cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry._ID));
+            String itemTitle = cursor.getString(cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry.COLUMN_NAME_TITLE));
+            Date itemStart = null, itemEnd = null;
+            try {
+                itemStart = formatter.parse(cursor.getString(cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry.COLUMN_NAME_START)));
+                itemEnd = formatter.parse(cursor.getString(cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry.COLUMN_NAME_END)));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            String itemStatus = cursor.getString(cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry.COLUMN_NAME_STATUS));
+            int itemAlarmStart = cursor.getInt(cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry.COLUMN_NAME_ALARM_START));
+            int itemAlarmEnd = cursor.getInt(cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry.COLUMN_NAME_ALARM_END));
+
+            newItem.setId(itemId);
+            newItem.setName(itemTitle);
+            newItem.setStart(itemStart);
+            newItem.setEnd(itemEnd);
+            newItem.setStatus(itemStatus);
+            newItem.setAlarmStart(itemAlarmStart);
+            newItem.setAlarmEnd(itemAlarmEnd);
+
+            coursesList.add(newItem);
+        }
+        cursor.close();
+        return coursesList;
+    }
+
+    public ArrayList<Course> getCoursesEnding() {
+        // Gets the data repository in read mode
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // setup columns
+        String[] columns = {
+                CoursesContract.CoursesEntry._ID,
+                CoursesContract.CoursesEntry.COLUMN_NAME_TERM_ID,
+                CoursesContract.CoursesEntry.COLUMN_NAME_TITLE,
+                CoursesContract.CoursesEntry.COLUMN_NAME_START,
+                CoursesContract.CoursesEntry.COLUMN_NAME_END,
+                CoursesContract.CoursesEntry.COLUMN_NAME_STATUS,
+                CoursesContract.CoursesEntry.COLUMN_NAME_ALARM_START,
+                CoursesContract.CoursesEntry.COLUMN_NAME_ALARM_END,
+        };
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd", Locale.US);
+        Calendar cal = Calendar.getInstance();
+        Date today = cal.getTime();
+        cal.add(Calendar.DAY_OF_MONTH, 7);
+        Date nextWeek = cal.getTime();
+
+
+        // Filter results WHERE "due_date" >= "yyyy/MM/dd" AND "due_date" <= "yyyy/MM/dd+7"
+        String selection = CoursesContract.CoursesEntry.COLUMN_NAME_ALARM_END + " = 1";
+        //String[] selectionArgs = {formatter.format(today), formatter.format(nextWeek)};
+
+        Cursor cursor = db.query(
+                CoursesContract.CoursesEntry.TABLE_NAME,   // The table to query
+                columns,             // The array of columns to return (pass null to get all)
+                selection,              // The columns for the WHERE clause
+                null,          // The values for the WHERE clause
+                null,                   // don't group the rows
+                null,                   // don't filter by row groups
+                null               // The sort order
+        );
+
+        ArrayList<Course> coursesList = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            Course newItem = new Course();
+
+            long itemId = cursor.getLong(
+                    cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry._ID));
+            String itemTitle = cursor.getString(cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry.COLUMN_NAME_TITLE));
+            Date itemStart = null, itemEnd = null;
+            try {
+                itemStart = formatter.parse(cursor.getString(cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry.COLUMN_NAME_START)));
+                itemEnd = formatter.parse(cursor.getString(cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry.COLUMN_NAME_END)));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            String itemStatus = cursor.getString(cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry.COLUMN_NAME_STATUS));
+            int itemAlarmStart = cursor.getInt(cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry.COLUMN_NAME_ALARM_START));
+            int itemAlarmEnd = cursor.getInt(cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry.COLUMN_NAME_ALARM_END));
+
+            newItem.setId(itemId);
+            newItem.setName(itemTitle);
+            newItem.setStart(itemStart);
+            newItem.setEnd(itemEnd);
+            newItem.setStatus(itemStatus);
+            newItem.setAlarmStart(itemAlarmStart);
+            newItem.setAlarmEnd(itemAlarmEnd);
+
+            coursesList.add(newItem);
+        }
+        cursor.close();
+        return coursesList;
+    }
+
+    public void alarmToggle(Object item, String alarmType) {
+
+        /*  TODO: This could be abstracted.
+         *  set the table name and columns in the switch,
+         *  do the database read and write using the variables
+         */
+        // Gets the data repository in read/write mode
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        switch (alarmType) {
+            case ALARM_ASSESSMENT_DUE:
+                // is item an Assessment?
+                if (item instanceof Assessment) {
+                    // toggle assessment due
+
+                    // setup columns
+                    String[] columns = {
+                            AssessmentsContract.AssessmentsEntry._ID,
+                            alarmType,
+                    };
+
+                    // Filter results WHERE _ID = item.getId()
+                    String selection = AssessmentsContract.AssessmentsEntry._ID + " = ?";
+                    String[] selectionArgs = {String.valueOf(((Assessment) item).getId())};
+
+                    Cursor cursor = db.query(
+                            AssessmentsContract.AssessmentsEntry.TABLE_NAME,   // The table to query
+                            columns,             // The array of columns to return (pass null to get all)
+                            selection,              // The columns for the WHERE clause
+                            selectionArgs,          // The values for the WHERE clause
+                            null,                   // don't group the rows
+                            null,                   // don't filter by row groups
+                            null               // The sort order
+                    );
+
+                    if (cursor.getCount() > 0) {
+                        cursor.moveToFirst();
+                        int value = cursor.getInt(cursor.getColumnIndexOrThrow(alarmType));
+                        value = (value == 0) ? 1 : 0;
+                        ContentValues contentValues = new ContentValues();
+                        contentValues.put(alarmType, value);
+                        String whereClause = AssessmentsContract.AssessmentsEntry._ID + " = ?";
+                        String[] whereArgs = {String.valueOf(((Assessment) item).getId())};
+
+                        // save the entry back
+                        int rows = db.update(AssessmentsContract.AssessmentsEntry.TABLE_NAME,
+                                contentValues,
+                                whereClause,
+                                whereArgs);
+                        if (rows == 0) {
+                            throw new RuntimeException("Unable to toggle alarm: " + contentValues.toString());
+                        }
+                    }
+                }
+                break;
+            case ALARM_COURSE_START:
+            case ALARM_COURSE_END:
+                // is item a Course?
+                if (item instanceof Course) {
+                    // toggle course start/end
+                    String[] columns = {
+                            CoursesContract.CoursesEntry._ID,
+                            alarmType,
+                    };
+
+                    // Filter results WHERE _ID = item.getId()
+                    String selection = CoursesContract.CoursesEntry._ID + " = ?";
+                    String[] selectionArgs = {String.valueOf(((Course) item).getId())};
+
+                    Cursor cursor = db.query(
+                            CoursesContract.CoursesEntry.TABLE_NAME,   // The table to query
+                            columns,             // The array of columns to return (pass null to get all)
+                            selection,              // The columns for the WHERE clause
+                            selectionArgs,          // The values for the WHERE clause
+                            null,                   // don't group the rows
+                            null,                   // don't filter by row groups
+                            null               // The sort order
+                    );
+
+                    if (cursor.getCount() > 0) {
+                        cursor.moveToFirst();
+                        int value = cursor.getInt(cursor.getColumnIndexOrThrow(alarmType));
+                        if (value == 1) {
+                            value = 0;
+                        } else {
+                            value = 1;
+                        }
+                        ContentValues contentValues = new ContentValues();
+                        contentValues.put(alarmType, value);
+
+                        String whereClause = CoursesContract.CoursesEntry._ID + " = ?";
+                        String[] whereArgs = {String.valueOf(((Course) item).getId())};
+
+                        // save the entry back
+                        int rows = db.update(CoursesContract.CoursesEntry.TABLE_NAME,
+                                contentValues,
+                                whereClause,
+                                whereArgs);
+                        if (rows == 0) {
+                            throw new RuntimeException("Unable to toggle alarm: " + contentValues.toString());
+                        }
+                    }
+
+                }
+                break;
+            default:
+                break;
+
+        }
+    }
+
     public class TermHasCoursesException extends Exception {
         public TermHasCoursesException() {
         }
@@ -312,6 +642,8 @@ public class StudentData extends SQLiteOpenHelper {
                 CoursesContract.CoursesEntry.COLUMN_NAME_TITLE,
                 CoursesContract.CoursesEntry.COLUMN_NAME_START,
                 CoursesContract.CoursesEntry.COLUMN_NAME_END,
+                CoursesContract.CoursesEntry.COLUMN_NAME_ALARM_START,
+                CoursesContract.CoursesEntry.COLUMN_NAME_ALARM_END,
                 CoursesContract.CoursesEntry.COLUMN_NAME_STATUS,
 
         };
@@ -357,7 +689,7 @@ public class StudentData extends SQLiteOpenHelper {
         ArrayList<Course> itemsList = new ArrayList<>();
         while (cursor_courses.moveToNext()) {
             Course newItem = new Course();
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/DD", Locale.US);
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd", Locale.US);
 
             long itemId = cursor_courses.getLong(
                     cursor_courses.getColumnIndexOrThrow(CoursesContract.CoursesEntry._ID));
@@ -400,6 +732,8 @@ public class StudentData extends SQLiteOpenHelper {
                 CoursesContract.CoursesEntry.COLUMN_NAME_START,
                 CoursesContract.CoursesEntry.COLUMN_NAME_END,
                 CoursesContract.CoursesEntry.COLUMN_NAME_STATUS,
+                CoursesContract.CoursesEntry.COLUMN_NAME_ALARM_START,
+                CoursesContract.CoursesEntry.COLUMN_NAME_ALARM_END,
         };
 
         // Filter results WHERE "_id" = 1
@@ -420,7 +754,7 @@ public class StudentData extends SQLiteOpenHelper {
         ArrayList<Course> itemsList = new ArrayList<>();
         while (cursor.moveToNext()) {
             Course newItem = new Course();
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/DD", Locale.US);
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd", Locale.US);
 
             long itemId = cursor.getLong(
                     cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry._ID));
@@ -434,10 +768,17 @@ public class StudentData extends SQLiteOpenHelper {
                 e.printStackTrace();
             }
 
+            String itemStatus = new String(cursor.getString(cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry.COLUMN_NAME_STATUS)));
+            int itemAlarmStart = cursor.getInt(cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry.COLUMN_NAME_ALARM_START));
+            int itemAlarmEnd = cursor.getInt(cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry.COLUMN_NAME_ALARM_END));
+
             newItem.setId(itemId);
             newItem.setName(itemTitle);
             newItem.setStart(itemStart);
             newItem.setEnd(itemEnd);
+            newItem.setStatus(itemStatus);
+            newItem.setAlarmStart(itemAlarmStart);
+            newItem.setAlarmStart(itemAlarmEnd);
 
             // mentors
             newItem.setMentorArrayList(this.getMentorsByCourseId(itemId));
@@ -463,6 +804,8 @@ public class StudentData extends SQLiteOpenHelper {
                 CoursesContract.CoursesEntry.COLUMN_NAME_START,
                 CoursesContract.CoursesEntry.COLUMN_NAME_END,
                 CoursesContract.CoursesEntry.COLUMN_NAME_STATUS,
+                CoursesContract.CoursesEntry.COLUMN_NAME_ALARM_START,
+                CoursesContract.CoursesEntry.COLUMN_NAME_ALARM_END,
         };
 
         // Filter results WHERE "_id" = 1
@@ -483,7 +826,7 @@ public class StudentData extends SQLiteOpenHelper {
         ArrayList<Course> itemsList = new ArrayList<>();
         while (cursor.moveToNext()) {
             Course newItem = new Course();
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/DD", Locale.US);
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd", Locale.US);
 
             long itemId = cursor.getLong(
                     cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry._ID));
@@ -498,14 +841,16 @@ public class StudentData extends SQLiteOpenHelper {
             }
 
             String itemStatus = new String(cursor.getString(cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry.COLUMN_NAME_STATUS)));
-
+            int itemAlarmStart = cursor.getInt(cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry.COLUMN_NAME_ALARM_START));
+            int itemAlarmEnd = cursor.getInt(cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry.COLUMN_NAME_ALARM_END));
 
             newItem.setId(itemId);
-            newItem.setTermId(cursor.getLong(cursor.getColumnIndexOrThrow(CoursesContract.CoursesEntry.COLUMN_NAME_TERM_ID)));
             newItem.setName(itemTitle);
+            newItem.setStatus(itemStatus);
             newItem.setStart(itemStart);
             newItem.setEnd(itemEnd);
-            newItem.setStatus(itemStatus);
+            newItem.setAlarmStart(itemAlarmStart);
+            newItem.setAlarmStart(itemAlarmEnd);
 
             // mentors
             newItem.setMentorArrayList(this.getMentorsByCourseId(itemId));
@@ -525,7 +870,7 @@ public class StudentData extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // date formatter
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/DD", Locale.US);
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd", Locale.US);
 
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
@@ -544,7 +889,7 @@ public class StudentData extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // date formatter
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/DD", Locale.US);
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd", Locale.US);
 
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
@@ -882,6 +1227,7 @@ public class StudentData extends SQLiteOpenHelper {
                 AssessmentsContract.AssessmentsEntry.COLUMN_NAME_TITLE,
                 AssessmentsContract.AssessmentsEntry.COLUMN_NAME_TYPE,
                 AssessmentsContract.AssessmentsEntry.COLUMN_NAME_DUE,
+                AssessmentsContract.AssessmentsEntry.COLUMN_NAME_ALARM_DUE,
         };
 
         // Filter results WHERE "_id" = 1
@@ -902,7 +1248,7 @@ public class StudentData extends SQLiteOpenHelper {
         ArrayList<Assessment> itemsList = new ArrayList<>();
         while (cursor.moveToNext()) {
             Assessment newItem = new Assessment();
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/DD", Locale.US);
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd", Locale.US);
 
             newItem.setId(cursor.getLong(cursor.getColumnIndexOrThrow(AssessmentsContract.AssessmentsEntry._ID)));
             newItem.setCourseId(cursor.getLong(cursor.getColumnIndexOrThrow(AssessmentsContract.AssessmentsEntry.COLUMN_NAME_COURSE_ID)));
@@ -915,6 +1261,7 @@ public class StudentData extends SQLiteOpenHelper {
                 e.printStackTrace();
             }
 
+            newItem.setAlarmDue(cursor.getInt(cursor.getColumnIndexOrThrow(AssessmentsContract.AssessmentsEntry.COLUMN_NAME_ALARM_DUE)));
 
             itemsList.add(newItem);
         }
@@ -926,7 +1273,7 @@ public class StudentData extends SQLiteOpenHelper {
         // Gets the data repository in write mode
         SQLiteDatabase db = this.getWritableDatabase();
 
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/DD", Locale.US);
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd", Locale.US);
 
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
@@ -944,8 +1291,7 @@ public class StudentData extends SQLiteOpenHelper {
         // Gets the data repository in read mode
         SQLiteDatabase db = this.getReadableDatabase();
 
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/DD", Locale.US);
-
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd", Locale.US);
         // columns from 'assessments'
         String[] columns = {
                 AssessmentsContract.AssessmentsEntry._ID,
@@ -953,6 +1299,7 @@ public class StudentData extends SQLiteOpenHelper {
                 AssessmentsContract.AssessmentsEntry.COLUMN_NAME_TITLE,
                 AssessmentsContract.AssessmentsEntry.COLUMN_NAME_TYPE,
                 AssessmentsContract.AssessmentsEntry.COLUMN_NAME_DUE,
+                AssessmentsContract.AssessmentsEntry.COLUMN_NAME_ALARM_DUE,
         };
 
         // Filter results WHERE "_id" = 1
@@ -985,11 +1332,14 @@ public class StudentData extends SQLiteOpenHelper {
                 e.printStackTrace();
             }
 
+            int itemAlarmDue = cursor.getInt(cursor.getColumnIndexOrThrow(AssessmentsContract.AssessmentsEntry.COLUMN_NAME_ALARM_DUE));
+
             newItem.setId(itemId);
             newItem.setCourseId(itemCourseId);
             newItem.setTitle(itemTitle);
             newItem.setType(itemType);
             newItem.setDueDate(itemDue);
+            newItem.setAlarmDue(itemAlarmDue);
 
             itemsList.add(newItem);
         }
@@ -1001,7 +1351,7 @@ public class StudentData extends SQLiteOpenHelper {
         // Gets the data repository in write mode
         SQLiteDatabase db = this.getWritableDatabase();
 
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/DD", Locale.US);
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd", Locale.US);
 
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
